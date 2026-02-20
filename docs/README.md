@@ -1,6 +1,6 @@
-# Duke
+# Crypto1010
 
-{Give product intro here}
+A CLI blockchain wallet simulator designed to help students understand cryptographic verification, state transitions, and consensus mechanisms in a hands-on way. 
 
 Useful links:
 * [User Guide](UserGuide.md)
