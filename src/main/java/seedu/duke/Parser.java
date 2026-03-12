@@ -40,7 +40,7 @@ public class Parser {
         CommandWord commandWord = parseCommand(components[0]);
         String arguments = components.length > 1 ? components[1].trim() : "";
         return switch (commandWord) {
-        case LIST -> new ListCommand();
+        case LIST -> new ListCommand(walletManager);
         case HELP -> new HelpCommand();
         case CREATE -> new CreateCommand(arguments, walletManager);
         case BALANCE -> new BalanceCommand();
