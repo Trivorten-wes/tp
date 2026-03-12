@@ -22,7 +22,7 @@ public class Duke {
                 if (c instanceof ExitCommand) {
                     break;
                 }
-                c.execute();
+                c.execute(components[1]);
             } catch (IllegalArgumentException e) {
                 System.out.println("Invalid Command");
             } catch (NoSuchElementException e) {
