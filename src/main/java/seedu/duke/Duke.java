@@ -23,11 +23,11 @@ public class Duke {
             String message = in.nextLine().strip();
             try {
                 String[] components = message.split("\\s+", 2);
-                Command c = Parser.parse(components[0], blockchain);
+                Command c = Parser.parse(components[0]);
                 if (c instanceof ExitCommand) {
                     break;
                 }
-                c.execute(blockchain);
+                c.execute(components[1], blockchain);
             } catch (Exceptions e) {
                 System.out.println(e.getMessage());
             } catch (IllegalArgumentException e) {
