@@ -25,8 +25,8 @@ public class Duke {
         while (true) {
             String message = in.nextLine().strip();
             try {
+                Command c = parser.parse(message);
                 String[] components = message.split("\\s+", 2);
-                Command c = parser.parse(components[0]);
                 String description = components.length > 1 ? components[1] : "";
                 if (c instanceof ExitCommand) {
                     saveBlockchain(storage, blockchain);
