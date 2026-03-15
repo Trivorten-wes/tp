@@ -20,19 +20,24 @@ public class Duke {
         Parser parser = new Parser(walletManager);
 
         while (true) {
+            String message = in.nextLine().strip();
             try {
-                String message = in.nextLine().strip();
-                Command c = parser.parse(message);
+                String[] components = message.split("\\s+", 2);
+                Command c = parser.parse(components[0]);
                 if (c instanceof ExitCommand) {
                     break;
                 }
-                c.execute(blockchain);
+                c.execute(components[1], blockchain);
             } catch (Exceptions e) {
                 System.out.println(e.getMessage());
             } catch (IllegalArgumentException e) {
                 System.out.println("Invalid Command");
             } catch (NoSuchElementException e) {
                 System.out.println("No Input");
+            } catch (ArrayIndexOutOfBoundsException e) {
+                String[] components = message.split("\\s+", 2);
+                Command c = parser.parse(components[0]);
+                c.execute("", blockchain);
             }
         }
     }
