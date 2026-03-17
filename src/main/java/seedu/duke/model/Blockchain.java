@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,6 +75,21 @@ public class Blockchain {
         }
 
         return ValidationResult.valid();
+    }
+
+    public void addTransactions(List<String> transactions) {
+        Objects.requireNonNull(transactions);
+        if (transactions.isEmpty()) {
+            throw new IllegalArgumentException("Transactions cannot be empty.");
+        }
+
+        Block previousBlock = blocks.get(blocks.size() - 1);
+        Block newBlock = new Block(
+                previousBlock.getIndex() + 1,
+                LocalDateTime.now(),
+                previousBlock.getCurrentHash(),
+                transactions);
+        blocks.add(newBlock);
     }
 
     public double getBalance(String walletName) {
