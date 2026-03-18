@@ -8,7 +8,9 @@ import java.math.RoundingMode;
 
 public class BalanceCommand extends Command {
     private static final String HELP_DESCRIPTION = """
-            Format: balance NAME
+            Format: balance w/WALLET_NAME
+            Example: balance w/Bob's Wallet
+            
             Displays the balance of wallet up to 8 decimal points
             """;
     private static final String NAME_ERROR = "Error: wallet name cannot be empty.";

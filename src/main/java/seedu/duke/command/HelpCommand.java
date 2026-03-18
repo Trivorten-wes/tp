@@ -6,11 +6,15 @@ import seedu.duke.model.WalletManager;
 
 public class HelpCommand extends Command {
     private static final String HELP_DESCRIPTION = """
-            format: help [COMMAND]
+            Format: help [c/COMMAND]
+            Example: help c/list
+            
             COMMAND is optional
             If no valid COMMAND is given: lists all the available commands
             If a valid COMMAND is given: displays details regarding that command
             """;
+    private static final String HELP_MESSAGE =
+            "For more details about each command type 'help c/COMMAND', eg. 'help c/list'";
 
     public HelpCommand() {
         super(HELP_DESCRIPTION);
