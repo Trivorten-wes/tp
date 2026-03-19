@@ -48,7 +48,7 @@ public class Crypto1010 {
             } catch (Exceptions e) {
                 System.out.println(e.getMessage());
             } catch (IllegalArgumentException e) {
-                System.out.println("Invalid Command");
+                System.out.println("Error: Invalid command. Use: help c/COMMAND");
             } catch (NoSuchElementException e) {
                 System.out.println("No Input");
             }
