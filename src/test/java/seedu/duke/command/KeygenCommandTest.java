@@ -1,6 +1,8 @@
 package seedu.duke.command;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import seedu.duke.exceptions.Exceptions;
 import seedu.duke.model.Blockchain;
@@ -22,6 +24,16 @@ class KeygenCommandTest {
         String output = runCommand(command, blockchain);
 
         assertTrue(output.contains("Key pair successfully generated"));
+    }
+
+    @Test
+    void execute_invalidFormat_throwsException() {
+        Blockchain blockchain = Blockchain.createDefault();
+        WalletManager walletManager = new WalletManager();
+        KeygenCommand command = new KeygenCommand("bob", walletManager);
+
+        Exceptions exception = assertThrows(Exceptions.class, () -> command.execute(blockchain));
+        assertEquals("Error: Invalid keygen format. Use: keygen w/WALLET_NAME", exception.getMessage());
     }
 
     private String runCommand(Command command, Blockchain blockchain) throws Exceptions {

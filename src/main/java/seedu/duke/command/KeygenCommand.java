@@ -15,7 +15,7 @@ public class KeygenCommand extends Command {
             Displays the process of creating a key pair
             """;
     private static final String INVALID_WALLET_NUMBER_ERROR = "Error: Invalid number of args";
-    private static final String INVALID_FORMAT_ERROR = "Error: Invalid send format. Use: keygen w/WALLET";
+    private static final String INVALID_FORMAT_ERROR = "Error: Invalid keygen format. Use: keygen w/WALLET_NAME";
     private static final String WALLET_NOT_FOUND_ERROR = "Error: Wallet not found";
     private static final String KEY_PAIR_GENERATION_SUCCESSFUL = "Key pair successfully generated";
 
