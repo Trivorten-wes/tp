@@ -32,10 +32,6 @@ public class Wallet {
         return address;
     }
 
-    public boolean hasGeneratedKeys() {
-        return publicKey != null && privateKey != null;
-    }
-
     public void addTransaction(String transactionEntry) {
         transactionHistory.add(Objects.requireNonNull(transactionEntry).trim());
     }

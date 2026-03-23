@@ -29,24 +29,6 @@ public class Key {
         this.walletAddress = isPublic ? deriveAddress(modulus, exponent) : null;
     }
 
-    private static String deriveAddress(BigInteger modulus, BigInteger exponent) {
-        BigInteger combined = modulus.add(exponent);
-        // multiply by a large prime to spread bits, then take mod to get exactly 160 bits
-        BigInteger spread = combined.multiply(BigInteger.valueOf(6364136223846793005L))
-                .abs()
-                .mod(BigInteger.TWO.pow(160));
-        // pad to exactly 40 hex characters
-        return "0x" + String.format("%040x", spread);
-    }
-
-    public BigInteger getModulus() {
-        return modulus;
-    }
-
-    public BigInteger getExponent() {
-        return exponent;
-    }
-
     public boolean isPublic() {
         return isPublic;
     }
@@ -99,5 +81,15 @@ public class Key {
         }
         return intRepresentation.substring(0, 10) + "..."
                 + intRepresentation.substring(intRepresentation.length() - 10);
+    }
+
+    private static String deriveAddress(BigInteger modulus, BigInteger exponent) {
+        BigInteger combined = modulus.add(exponent);
+        // multiply by a large prime to spread bits, then take mod to get exactly 160 bits
+        BigInteger spread = combined.multiply(BigInteger.valueOf(6364136223846793005L))
+                .abs()
+                .mod(BigInteger.TWO.pow(160));
+        // pad to exactly 40 hex characters
+        return "0x" + String.format("%040x", spread);
     }
 }
