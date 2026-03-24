@@ -3,7 +3,7 @@ package seedu.crypto1010.command;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import seedu.crypto1010.exceptions.Exceptions;
+import seedu.crypto1010.exceptions.Crypto1010Exception;
 import seedu.crypto1010.model.Block;
 import seedu.crypto1010.model.Blockchain;
 
@@ -145,7 +145,8 @@ class ValidateCommandTest {
         Blockchain blockchain = Blockchain.createDefault();
         ValidateCommand command = new ValidateCommand();
 
-        Exceptions exception = assertThrows(Exceptions.class, () -> command.execute("extra", blockchain));
+        Crypto1010Exception exception = assertThrows(Crypto1010Exception.class,
+                () -> command.execute("extra", blockchain));
         assertEquals("Error: Invalid validate format. Use: validate", exception.getMessage());
     }
 
@@ -155,7 +156,7 @@ class ValidateCommandTest {
         System.setOut(new PrintStream(outputStream));
         try {
             command.execute(blockchain);
-        } catch (Exceptions e) {
+        } catch (Crypto1010Exception e) {
             throw new RuntimeException(e);
         } finally {
             System.setOut(originalOut);

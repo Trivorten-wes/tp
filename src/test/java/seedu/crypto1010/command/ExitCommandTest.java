@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import seedu.crypto1010.exceptions.Exceptions;
+import seedu.crypto1010.exceptions.Crypto1010Exception;
 import seedu.crypto1010.model.Blockchain;
 
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,8 @@ class ExitCommandTest {
         ExitCommand command = new ExitCommand();
         Blockchain blockchain = Blockchain.createDefault();
 
-        Exceptions exception = assertThrows(Exceptions.class, () -> command.execute("now", blockchain));
+        Crypto1010Exception exception = assertThrows(Crypto1010Exception.class,
+                () -> command.execute("now", blockchain));
         assertEquals("Error: Invalid exit format. Use: exit", exception.getMessage());
     }
 }

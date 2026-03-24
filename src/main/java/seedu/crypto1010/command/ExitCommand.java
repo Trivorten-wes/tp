@@ -1,6 +1,6 @@
 package seedu.crypto1010.command;
 
-import seedu.crypto1010.exceptions.Exceptions;
+import seedu.crypto1010.exceptions.Crypto1010Exception;
 import seedu.crypto1010.model.Blockchain;
 
 public class ExitCommand extends Command {
@@ -15,9 +15,9 @@ public class ExitCommand extends Command {
     }
 
     @Override
-    public void execute(String description, Blockchain blockchain) throws Exceptions {
+    public void execute(String description, Blockchain blockchain) throws Crypto1010Exception {
         if (description != null && !description.isBlank()) {
-            throw new Exceptions(INVALID_FORMAT_ERROR);
+            throw new Crypto1010Exception(INVALID_FORMAT_ERROR);
         }
     }
 }

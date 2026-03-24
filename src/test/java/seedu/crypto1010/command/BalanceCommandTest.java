@@ -3,7 +3,7 @@ package seedu.crypto1010.command;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import seedu.crypto1010.exceptions.Exceptions;
+import seedu.crypto1010.exceptions.Crypto1010Exception;
 import seedu.crypto1010.model.Block;
 import seedu.crypto1010.model.Blockchain;
 import seedu.crypto1010.model.WalletManager;
@@ -78,7 +78,7 @@ class BalanceCommandTest {
         WalletManager walletManager = new WalletManager();
         BalanceCommand command = new BalanceCommand("w/   ", walletManager);
 
-        Exceptions exception = assertThrows(Exceptions.class, () -> command.execute(blockchain));
+        Crypto1010Exception exception = assertThrows(Crypto1010Exception.class, () -> command.execute(blockchain));
         assertEquals("Error: wallet name cannot be empty. Use: balance w/WALLET_NAME", exception.getMessage());
     }
 
@@ -88,7 +88,7 @@ class BalanceCommandTest {
         WalletManager walletManager = new WalletManager();
         BalanceCommand command = new BalanceCommand("alice", walletManager);
 
-        Exceptions exception = assertThrows(Exceptions.class, () -> command.execute(blockchain));
+        Crypto1010Exception exception = assertThrows(Crypto1010Exception.class, () -> command.execute(blockchain));
         assertEquals("Error: Invalid balance format. Use: balance w/WALLET_NAME", exception.getMessage());
     }
 
@@ -98,9 +98,9 @@ class BalanceCommandTest {
         WalletManager walletManager = new WalletManager();
         BalanceCommand command = new BalanceCommand("w/alice bob", walletManager);
 
-        Exceptions exception = assertThrows(Exceptions.class, () -> command.execute(blockchain));
+        Crypto1010Exception exception = assertThrows(Crypto1010Exception.class, () -> command.execute(blockchain));
         assertEquals("Error: wallet name must be one word without spaces. Use: balance w/WALLET_NAME",
-            exception.getMessage());
+                exception.getMessage());
     }
 
     @Test
@@ -109,7 +109,7 @@ class BalanceCommandTest {
         WalletManager walletManager = new WalletManager();
         BalanceCommand command = new BalanceCommand("w/ghost", walletManager);
 
-        Exceptions exception = assertThrows(Exceptions.class, () -> command.execute(blockchain));
+        Crypto1010Exception exception = assertThrows(Crypto1010Exception.class, () -> command.execute(blockchain));
         assertEquals("Error: Wallet not found.", exception.getMessage());
     }
 
@@ -119,7 +119,7 @@ class BalanceCommandTest {
         System.setOut(new PrintStream(outputStream));
         try {
             command.execute(blockchain);
-        } catch (Exceptions e) {
+        } catch (Crypto1010Exception e) {
             throw new RuntimeException(e);
         } finally {
             System.setOut(originalOut);

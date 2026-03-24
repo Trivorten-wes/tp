@@ -2,7 +2,7 @@ package seedu.crypto1010;
 
 import seedu.crypto1010.command.Command;
 import seedu.crypto1010.command.ExitCommand;
-import seedu.crypto1010.exceptions.Exceptions;
+import seedu.crypto1010.exceptions.Crypto1010Exception;
 import seedu.crypto1010.model.Blockchain;
 import seedu.crypto1010.model.WalletManager;
 import seedu.crypto1010.storage.BlockchainStorage;
@@ -46,7 +46,7 @@ public class Crypto1010 {
                 }
                 c.execute(description, blockchain);
                 saveData(blockchainStorage, walletStorage, blockchain, walletManager);
-            } catch (Exceptions e) {
+            } catch (Crypto1010Exception e) {
                 System.out.println(e.getMessage());
             } catch (IllegalArgumentException e) {
                 System.out.println("Error: Invalid command. Use: help c/COMMAND");

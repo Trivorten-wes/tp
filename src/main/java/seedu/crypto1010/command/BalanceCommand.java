@@ -1,6 +1,6 @@
 package seedu.crypto1010.command;
 
-import seedu.crypto1010.exceptions.Exceptions;
+import seedu.crypto1010.exceptions.Crypto1010Exception;
 import seedu.crypto1010.model.Blockchain;
 import seedu.crypto1010.model.WalletManager;
 
@@ -30,33 +30,33 @@ public class BalanceCommand extends Command {
     }
 
     @Override
-    public void execute(String description, Blockchain blockchain) throws Exceptions {
+    public void execute(String description, Blockchain blockchain) throws Crypto1010Exception {
         String walletName = parseArguments(arguments);
         String trimmedWalletName = walletName.trim();
         if (!walletManager.hasWallet(trimmedWalletName)) {
-            throw new Exceptions(WALLET_NOT_FOUND_ERROR);
+            throw new Crypto1010Exception(WALLET_NOT_FOUND_ERROR);
         }
         BigDecimal balance = blockchain.getPreciseBalance(trimmedWalletName);
 
         System.out.println("Balance of " + trimmedWalletName + ": " + formatBalance(balance));
     }
 
-    private String parseArguments(String args) throws Exceptions {
+    private String parseArguments(String args) throws Crypto1010Exception {
         if (args == null || args.isBlank()) {
-            throw new Exceptions(NAME_ERROR + " " + BALANCE_FORMAT);
+            throw new Crypto1010Exception(NAME_ERROR + " " + BALANCE_FORMAT);
         }
 
         String trimmedArgs = args.trim();
         if (!trimmedArgs.startsWith("w/")) {
-            throw new Exceptions(INVALID_FORMAT_ERROR);
+            throw new Crypto1010Exception(INVALID_FORMAT_ERROR);
         }
 
         String walletName = trimmedArgs.substring(2).trim();
         if (walletName.isEmpty()) {
-            throw new Exceptions(NAME_ERROR + " " + BALANCE_FORMAT);
+            throw new Crypto1010Exception(NAME_ERROR + " " + BALANCE_FORMAT);
         }
         if (walletName.chars().anyMatch(Character::isWhitespace)) {
-            throw new Exceptions(NAME_WHITESPACE_ERROR + " " + BALANCE_FORMAT);
+            throw new Crypto1010Exception(NAME_WHITESPACE_ERROR + " " + BALANCE_FORMAT);
         }
 
         return walletName;
