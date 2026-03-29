@@ -9,6 +9,7 @@ import seedu.duke.command.HelpCommand;
 import seedu.duke.command.KeygenCommand;
 import seedu.duke.command.ListCommand;
 import seedu.duke.command.SendCommand;
+import seedu.duke.command.TutorialCommand;
 import seedu.duke.command.ValidateCommand;
 import seedu.duke.command.ViewBlockCommand;
 import seedu.duke.model.WalletManager;
@@ -49,6 +50,7 @@ public class Parser {
         case EXIT -> new ExitCommand();
         case SEND -> new SendCommand(arguments, walletManager);
         case KEYGEN -> new KeygenCommand(arguments, walletManager);
+        case TUTORIAL -> new TutorialCommand();
         };
     }
 }

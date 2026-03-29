@@ -3,6 +3,7 @@ package seedu.duke.command;
 public enum CommandWord {
     HELP("help", "lists all commands"),
     EXIT("exit", "exits the program"),
+    TUTORIAL("tutorial", "gives instructions on how to use the commands"),
 
     // Wallet related commands
     CREATE("create", "creates a new wallet"),

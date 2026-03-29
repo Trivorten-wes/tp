@@ -50,31 +50,4 @@ public class HelpCommand extends Command {
             System.out.println("Please input a valid command, use 'help' to see the list of commands");
         }
     }
-
-    private void tutorial() {
-        Scanner in = new Scanner(System.in);
-        String[] instructions = {
-                "create w/alice",
-                "create w/bob",
-                "keygen w/alice",
-                "keygen w/bob",
-                "list",
-        };
-        int index = 0;
-
-        while (true) {
-            System.out.println("Enter the following command:");
-            System.out.println(instructions[index]);
-            String input = in.nextLine().strip();
-            if (input.equals(instructions[index])) {
-                // Do the executing
-                index++;
-            } else if (input.equals("exit()")) {
-                return;
-            } else {
-                System.out.println("That was not the given instruction");
-                System.out.println("If you wish to exit type: exit()");
-            }
-        }
-    }
 }
