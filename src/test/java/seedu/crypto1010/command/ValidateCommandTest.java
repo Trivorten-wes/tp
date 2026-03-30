@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-class ValidateCommandTest {
+class  ValidateCommandTest {
     @Test
     void execute_validBlockchain_printsSuccessMessage() {
         Blockchain blockchain = Blockchain.createDefault();
