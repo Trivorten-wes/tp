@@ -44,7 +44,8 @@ public class SendCommand extends Command {
     private static final String FEE_INVALID_ERROR = "Error: Fee must be a non-negative number.";
     private static final String SPEED_INVALID_ERROR = "Error: Unsupported speed. Use speed/slow, speed/standard,"
             + " or speed/fast.";
-    private static final String INSUFFICIENT_BALANCE_ERROR = "Error: Insufficient balance.";
+    private static final String INSUFFICIENT_BALANCE_ERROR =
+            "invalid, sent amount is more than balance, nothing was sent";
     private static final String INVALID_ADDRESS_ERROR = "Error: Invalid recipient address.";
 
     private final String arguments;

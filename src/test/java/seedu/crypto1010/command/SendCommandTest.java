@@ -49,11 +49,13 @@ class SendCommandTest {
     void execute_insufficientBalance_throwsException() {
         Blockchain blockchain = Blockchain.createDefault();
         WalletManager walletManager = new WalletManager();
-        walletManager.createWallet("alice"); // alice has balance -10
+        Wallet wallet = walletManager.createWallet("alice"); // alice has balance -10
         SendCommand command = new SendCommand("w/alice to/" + ETH_ADDRESS + " amt/1", walletManager);
 
         Crypto1010Exception exception = assertThrows(Crypto1010Exception.class, () -> command.execute(blockchain));
-        assertEquals("Error: Insufficient balance.", exception.getMessage());
+        assertEquals("invalid, sent amount is more than balance, nothing was sent", exception.getMessage());
+        assertEquals(2, blockchain.size());
+        assertTrue(wallet.getTransactionHistory().isEmpty());
     }
 
     @Test
