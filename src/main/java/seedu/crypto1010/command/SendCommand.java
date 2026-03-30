@@ -14,8 +14,11 @@ import java.util.regex.Pattern;
 public class SendCommand extends Command {
     private static final Pattern PREFIX_PATTERN = Pattern.compile("(w/|to/|amt/|speed/|fee/|note/)");
     private static final Pattern ETH_ADDRESS_PATTERN = Pattern.compile("^0x[a-fA-F0-9]{40}$");
-    private static final Pattern BTC_ADDRESS_PATTERN =
-        Pattern.compile("^(bc1[ac-hj-np-z02-9]{11,71}|[13][a-km-zA-HJ-NP-Z1-9]{25,34})$");
+    private static final Pattern BTC_LEGACY_ADDRESS_PATTERN =
+            Pattern.compile("^[13][A-HJ-NP-Za-km-z1-9]{25,34}$");
+    private static final Pattern BTC_BECH32_ADDRESS_PATTERN =
+            Pattern.compile("^(bc1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{11,71}"
+                    + "|BC1[QPZRY9X8GF2TVDW0S3JN54KHCE6MUA7L]{11,71})$");
     private static final Pattern SOL_ADDRESS_PATTERN = Pattern.compile("^[1-9A-HJ-NP-Za-km-z]{32,44}$");
 
     private static final String DEFAULT_SPEED = "standard";
@@ -258,7 +261,8 @@ public class SendCommand extends Command {
             return false;
         }
         return ETH_ADDRESS_PATTERN.matcher(address).matches()
-                || BTC_ADDRESS_PATTERN.matcher(address).matches()
+                || BTC_LEGACY_ADDRESS_PATTERN.matcher(address).matches()
+                || BTC_BECH32_ADDRESS_PATTERN.matcher(address).matches()
                 || SOL_ADDRESS_PATTERN.matcher(address).matches();
     }
 

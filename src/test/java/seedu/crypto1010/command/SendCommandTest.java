@@ -19,6 +19,8 @@ import org.junit.jupiter.api.Test;
 
 class SendCommandTest {
     private static final String ETH_ADDRESS = "0x1111111111111111111111111111111111111111";
+    private static final String BTC_ADDRESS = "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt080";
+    private static final String SOL_ADDRESS = "So11111111111111111111111111111111111111112";
 
     @Test
     void execute_validSendWithDefaultSpeed_recordsTransactionAndHistory() {
@@ -111,6 +113,32 @@ class SendCommandTest {
     }
 
     @Test
+    void execute_validBitcoinAddress_succeeds() {
+        Blockchain blockchain = Blockchain.createDefault();
+        WalletManager walletManager = new WalletManager();
+        walletManager.createWallet("bob");
+        SendCommand command = new SendCommand("w/bob to/" + BTC_ADDRESS + " amt/1 fee/0", walletManager);
+
+        String output = runCommand(command, blockchain);
+
+        assertTrue(output.contains("Transaction sent successfully."));
+        assertTrue(output.contains("To: " + BTC_ADDRESS));
+    }
+
+    @Test
+    void execute_validSolanaAddress_succeeds() {
+        Blockchain blockchain = Blockchain.createDefault();
+        WalletManager walletManager = new WalletManager();
+        walletManager.createWallet("bob");
+        SendCommand command = new SendCommand("w/bob to/" + SOL_ADDRESS + " amt/1 fee/0", walletManager);
+
+        String output = runCommand(command, blockchain);
+
+        assertTrue(output.contains("Transaction sent successfully."));
+        assertTrue(output.contains("To: " + SOL_ADDRESS));
+    }
+
+    @Test
     void execute_invalidAddress_throwsException() {
         Blockchain blockchain = Blockchain.createDefault();
         WalletManager walletManager = new WalletManager();
@@ -121,6 +149,20 @@ class SendCommandTest {
         assertEquals("Error: Invalid recipient address. Use: send w/WALLET_NAME"
             + " to/RECIPIENT_ADDRESS amt/AMOUNT [speed/SPEED] [fee/FEE] [note/MEMO]",
             exception.getMessage());
+    }
+
+    @Test
+    void execute_invalidBitcoinAddressCharacters_throwsException() {
+        Blockchain blockchain = Blockchain.createDefault();
+        WalletManager walletManager = new WalletManager();
+        walletManager.createWallet("bob");
+        SendCommand command = new SendCommand("w/bob to/bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kygt08I amt/1",
+                walletManager);
+
+        Crypto1010Exception exception = assertThrows(Crypto1010Exception.class, () -> command.execute(blockchain));
+        assertEquals("Error: Invalid recipient address. Use: send w/WALLET_NAME"
+                + " to/RECIPIENT_ADDRESS amt/AMOUNT [speed/SPEED] [fee/FEE] [note/MEMO]",
+                exception.getMessage());
     }
 
     @Test
