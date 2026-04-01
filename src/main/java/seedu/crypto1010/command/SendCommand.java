@@ -8,6 +8,7 @@ import seedu.crypto1010.service.TransferRequest;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 
 public class SendCommand extends Command {
@@ -20,6 +21,13 @@ public class SendCommand extends Command {
     private static final Pattern SOL_ADDRESS_PATTERN = Pattern.compile("^[1-9A-HJ-NP-Za-km-z]{32,44}$");
 
     private static final String DEFAULT_SPEED = "standard";
+    private static final String MANUAL_SPEED_LABEL = "manual";
+    private static final String WALLET_PREFIX = "w/";
+    private static final String RECIPIENT_PREFIX = "to/";
+    private static final String AMOUNT_PREFIX = "amt/";
+    private static final String SPEED_PREFIX = "speed/";
+    private static final String FEE_PREFIX = "fee/";
+    private static final String NOTE_PREFIX = "note/";
     private static final BigDecimal SLOW_FEE = new BigDecimal("0.0005");
     private static final BigDecimal STANDARD_FEE = new BigDecimal("0.0010");
     private static final BigDecimal FAST_FEE = new BigDecimal("0.0020");
@@ -64,10 +72,7 @@ public class SendCommand extends Command {
             throw new Crypto1010Exception(INVALID_FORMAT_ERROR);
         }
 
-        BigDecimal amount = parseDecimal(parsed.amount);
-        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new Crypto1010Exception(AMOUNT_INVALID_ERROR + " " + SEND_FORMAT);
-        }
+        BigDecimal amount = parsePositiveAmount(parsed.amount);
 
         if (!walletManager.hasWallet(parsed.walletName)) {
             throw new Crypto1010Exception(WALLET_NOT_FOUND_ERROR);
@@ -77,17 +82,11 @@ public class SendCommand extends Command {
             throw new Crypto1010Exception(INVALID_ADDRESS_ERROR + " " + SEND_FORMAT);
         }
 
-        String speed = parsed.speed == null ? DEFAULT_SPEED : parsed.speed.toLowerCase();
-        if (!isSupportedSpeed(speed)) {
-            throw new Crypto1010Exception(SPEED_INVALID_ERROR + " " + SEND_FORMAT);
-        }
+        String speed = resolveSpeed(parsed.speed);
 
-        BigDecimal fee = resolveFee(parsed.fee, speed);
-        if (fee == null) {
-            throw new Crypto1010Exception(FEE_INVALID_ERROR + " " + SEND_FORMAT);
-        }
+        BigDecimal fee = resolveValidatedFee(parsed.fee, speed);
 
-        String speedLabel = parsed.fee == null ? speed : "manual";
+        String speedLabel = parsed.fee == null ? speed : MANUAL_SPEED_LABEL;
         TransferRequest transferRequest = new TransferRequest(
                 parsed.walletName,
                 parsed.recipientAddress,
@@ -97,6 +96,34 @@ public class SendCommand extends Command {
                 parsed.note);
         transactionRecordingService.recordTransfer(transferRequest, blockchain);
 
+        printTransferSummary(transferRequest);
+    }
+
+    private BigDecimal parsePositiveAmount(String amountArgument) throws Crypto1010Exception {
+        BigDecimal amount = parseDecimal(amountArgument);
+        if (amount == null || amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new Crypto1010Exception(AMOUNT_INVALID_ERROR + " " + SEND_FORMAT);
+        }
+        return amount;
+    }
+
+    private String resolveSpeed(String speedArgument) throws Crypto1010Exception {
+        String speed = speedArgument == null ? DEFAULT_SPEED : speedArgument.toLowerCase();
+        if (!isSupportedSpeed(speed)) {
+            throw new Crypto1010Exception(SPEED_INVALID_ERROR + " " + SEND_FORMAT);
+        }
+        return speed;
+    }
+
+    private BigDecimal resolveValidatedFee(String feeArgument, String speed) throws Crypto1010Exception {
+        BigDecimal fee = resolveFee(feeArgument, speed);
+        if (fee == null) {
+            throw new Crypto1010Exception(FEE_INVALID_ERROR + " " + SEND_FORMAT);
+        }
+        return fee;
+    }
+
+    private void printTransferSummary(TransferRequest transferRequest) {
         System.out.println("Transaction sent successfully.");
         System.out.println("Wallet: " + transferRequest.getSenderWalletName());
         System.out.println("To: " + transferRequest.getRecipientAddress());
@@ -114,88 +141,88 @@ public class SendCommand extends Command {
         }
 
         String[] tokens = args.trim().split("\\s+");
-
         ParsedArgs parsed = new ParsedArgs();
-        boolean hasWallet = false;
-        boolean hasRecipient = false;
-        boolean hasAmount = false;
-        boolean hasSpeed = false;
-        boolean hasFee = false;
-        boolean hasNote = false;
 
         for (int i = 0; i < tokens.length; i++) {
             String token = tokens[i];
-            String value;
+            if (token.isBlank()) {
+                continue;
+            }
 
-            if (token.startsWith("note/")) {
-                if (hasNote) {
+            if (token.startsWith(NOTE_PREFIX)) {
+                if (parsed.note != null) {
                     return null;
                 }
-                StringBuilder noteBuilder = new StringBuilder(token.substring("note/".length()));
-                for (int j = i + 1; j < tokens.length; j++) {
-                    noteBuilder.append(" ").append(tokens[j]);
-                }
-                value = noteBuilder.toString().trim();
-                if (value.isEmpty()) {
+                parsed.note = extractNoteValue(tokens, i);
+                if (parsed.note == null) {
                     return null;
                 }
-                parsed.note = value;
-                hasNote = true;
                 break;
             }
 
-            if (token.startsWith("w/")) {
-                value = token.substring("w/".length()).trim();
-                if (hasWallet || value.isEmpty() || containsWhitespace(value)) {
-                    return null;
-                }
-                parsed.walletName = value;
-                hasWallet = true;
+            TokenParseResult result = parseSingleValueToken(
+                    token,
+                    parsed,
+                    WALLET_PREFIX,
+                    parsed.walletName,
+                    value -> parsed.walletName = value);
+            if (result == TokenParseResult.PARSED) {
                 continue;
             }
-
-            if (token.startsWith("to/")) {
-                value = token.substring("to/".length()).trim();
-                if (hasRecipient || value.isEmpty() || containsWhitespace(value)) {
-                    return null;
-                }
-                parsed.recipientAddress = value;
-                hasRecipient = true;
-                continue;
+            if (result == TokenParseResult.INVALID) {
+                return null;
             }
 
-            if (token.startsWith("amt/")) {
-                value = token.substring("amt/".length()).trim();
-                if (hasAmount || value.isEmpty() || containsWhitespace(value)) {
-                    return null;
-                }
-                parsed.amount = value;
-                hasAmount = true;
+            result = parseSingleValueToken(
+                    token,
+                    parsed,
+                    RECIPIENT_PREFIX,
+                    parsed.recipientAddress,
+                    value -> parsed.recipientAddress = value);
+            if (result == TokenParseResult.PARSED) {
                 continue;
             }
-
-            if (token.startsWith("speed/")) {
-                value = token.substring("speed/".length()).trim();
-                if (hasSpeed || value.isEmpty() || containsWhitespace(value)) {
-                    return null;
-                }
-                parsed.speed = value;
-                hasSpeed = true;
-                continue;
+            if (result == TokenParseResult.INVALID) {
+                return null;
             }
 
-            if (token.startsWith("fee/")) {
-                value = token.substring("fee/".length()).trim();
-                if (hasFee || value.isEmpty() || containsWhitespace(value)) {
-                    return null;
-                }
-                parsed.fee = value;
-                hasFee = true;
+            result = parseSingleValueToken(
+                    token,
+                    parsed,
+                    AMOUNT_PREFIX,
+                    parsed.amount,
+                    value -> parsed.amount = value);
+            if (result == TokenParseResult.PARSED) {
                 continue;
             }
+            if (result == TokenParseResult.INVALID) {
+                return null;
+            }
 
-            if (token.isBlank()) {
+            result = parseSingleValueToken(
+                    token,
+                    parsed,
+                    SPEED_PREFIX,
+                    parsed.speed,
+                    value -> parsed.speed = value);
+            if (result == TokenParseResult.PARSED) {
                 continue;
+            }
+            if (result == TokenParseResult.INVALID) {
+                return null;
+            }
+
+            result = parseSingleValueToken(
+                    token,
+                    parsed,
+                    FEE_PREFIX,
+                    parsed.fee,
+                    value -> parsed.fee = value);
+            if (result == TokenParseResult.PARSED) {
+                continue;
+            }
+            if (result == TokenParseResult.INVALID) {
+                return null;
             }
             return null;
         }
@@ -205,6 +232,30 @@ public class SendCommand extends Command {
         }
 
         return parsed;
+    }
+
+    private String extractNoteValue(String[] tokens, int noteTokenIndex) {
+        StringBuilder noteBuilder = new StringBuilder(tokens[noteTokenIndex].substring(NOTE_PREFIX.length()));
+        for (int i = noteTokenIndex + 1; i < tokens.length; i++) {
+            noteBuilder.append(" ").append(tokens[i]);
+        }
+        String noteValue = noteBuilder.toString().trim();
+        return noteValue.isEmpty() ? null : noteValue;
+    }
+
+    private TokenParseResult parseSingleValueToken(String token, ParsedArgs parsed, String prefix,
+                                                   String existingValue, Consumer<String> setter) {
+        if (!token.startsWith(prefix)) {
+            return TokenParseResult.NOT_MATCHED;
+        }
+
+        String value = token.substring(prefix.length()).trim();
+        if (existingValue != null || value.isEmpty() || containsWhitespace(value)) {
+            return TokenParseResult.INVALID;
+        }
+
+        setter.accept(value);
+        return TokenParseResult.PARSED;
     }
 
     private BigDecimal parseDecimal(String amountStr) {
@@ -257,5 +308,11 @@ public class SendCommand extends Command {
         String speed;
         String fee;
         String note;
+    }
+
+    private enum TokenParseResult {
+        NOT_MATCHED,
+        PARSED,
+        INVALID
     }
 }
