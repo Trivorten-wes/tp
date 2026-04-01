@@ -1,6 +1,6 @@
 # Crypto1010 User Guide  
 ## Introduction
-Crypto1010 is a command-line blockchain wallet simulator. It supports account login/registration, wallet creation, key generation, transfers, balance queries, wallet history lookup, and blockchain validation.
+Crypto1010 is a command-line blockchain wallet simulator. It supports account login/registration, wallet creation, key generation, wallet-to-address transfers, account-to-account transfers, balance queries, wallet history lookup, and blockchain validation.
 
 The application is designed for educational use and records transactions in a simple blockchain persisted as JSON. Each account has its own isolated wallets, blockchain data, and transaction history after login.
 
@@ -15,6 +15,7 @@ The application is designed for educational use and records transactions in a si
   + #### [Generate keys for a wallet: `keygen`](#keygen-generate-keys-for-a-wallet)
   + #### [Show wallet balance: `balance`](#balance-show-wallet-balance)
   + #### [Create a transfer transaction: `send`](#send-create-a-transfer-transaction)
+  + #### [Cross-account transfer: `crossSend`](#crosssend-cross-account-transfer)
   + #### [Show wallet send history: `history`](#history-show-wallet-send-history)
   + #### [Validate blockchain integrity: `validate`](#validate-validate-blockchain-integrity)
   + #### [View one block: `viewblock`](#viewblock-view-one-block)
@@ -106,19 +107,24 @@ Examples:
 - `help send`
 
 ### `create`: Create a wallet
-Format: `create w/WALLET_NAME`
+Format: `create w/WALLET_NAME [curr/CURRENCY]`
 
 - Creates a wallet in memory for the current session.
 - Wallet names are unique (case-insensitive).
+- `curr/` is optional.
+- A wallet tagged with a specific currency can be used by `crossSend`.
+- At most one wallet per specific currency is allowed in the same account.
 
 Examples:
 - `create w/alice`
 - `create w/bob`
+- `create w/main curr/btc`
 
 ### `list`: List wallets
 Format: `list`
 
 - Shows all wallets created in the current session.
+- Wallets created with a specific currency display that currency in the list.
 
 ### `keygen`: Generate keys for a wallet
 Format: `keygen w/WALLET_NAME`
@@ -156,6 +162,19 @@ Examples:
 - `send w/bob to/0x1111111111111111111111111111111111111111 amt/2 speed/fast`
 - `send w/bob to/0x1111111111111111111111111111111111111111 amt/2 fee/0.02 note/Urgent payment`
 
+### `crossSend`: Cross-account transfer
+Format: `crossSend acc/ACCOUNT_NAME amt/AMOUNT curr/CURRENCY`
+
+- Transfers `AMOUNT` from the current account's wallet tagged with `CURRENCY` to another account user.
+- Only same-currency transfer is supported. No exchange or conversion is performed.
+- The recipient account must exist.
+- If the recipient account does not already have a wallet for `CURRENCY`, Crypto1010 creates one automatically.
+- The current account must have exactly one wallet tagged with that `CURRENCY`, and it must have enough balance.
+
+Examples:
+- `crossSend acc/alice amt/2 curr/btc`
+- `crossSend acc/bob amt/0.5 curr/eth`
+
 ### `history`: Show wallet send history
 Format: `history w/WALLET_NAME`
 
@@ -189,20 +208,20 @@ Format: `exit`
 ## Coming Soon
 Based on planned work tracked in project discussions/issues, the next user-facing feature is:
 
-### Cross-account transfers (planned)
-- Send currency from wallets in one account to wallets owned by a different account user.
-- Add account-aware address discovery so local transfers can resolve recipients beyond the current login session.
-- Expand persistence to keep wallet addresses available across accounts after restart.
+### Cross-account address discovery (planned)
+- Resolve local wallet addresses across accounts without requiring a direct account name transfer command.
+- Persist generated keys and wallet addresses across restarts so account-to-account interactions are easier to continue.
 
 This feature is not available yet in the current release.
 ---
 ## Command Summary
 - `help [COMMAND]`
-- `create w/WALLET_NAME`
+- `create w/WALLET_NAME [curr/CURRENCY]`
 - `list`
 - `keygen w/WALLET_NAME`
 - `balance w/WALLET_NAME`
 - `send w/WALLET_NAME to/RECIPIENT_ADDRESS amt/AMOUNT [speed/SPEED] [fee/FEE] [note/MEMO]`
+- `crossSend acc/ACCOUNT_NAME amt/AMOUNT curr/CURRENCY`
 - `history w/WALLET_NAME`
 - `validate`
 - `viewblock INDEX`
@@ -211,7 +230,7 @@ This feature is not available yet in the current release.
 ## Data and Persistence
 - Account credentials are stored in `data/accounts/credentials.txt`.
 - Each account has its own blockchain data at `data/accounts/USERNAME/blockchain.json`.
-- Each account has its own wallet names and wallet send history at `data/accounts/USERNAME/wallets.txt`.
+- Each account has its own wallet names, wallet currencies, and wallet send history at `data/accounts/USERNAME/wallets.txt`.
 - Generated keys and wallet addresses are not currently persisted; run `keygen` again after restarting if you need an address.
 ---
 ## FAQ
@@ -225,7 +244,7 @@ This feature is not available yet in the current release.
 **A**: Wallet names and send history are persisted, but generated keys and wallet addresses are not. Run `keygen w/WALLET_NAME` again.
 
 **Q**: Can I transfer to a wallet name directly?  
-**A**: No. `send` requires a recipient address string in `to/`.
+**A**: `send` still requires a recipient address string in `to/`. For direct account-to-account transfer, use `crossSend acc/ACCOUNT_NAME amt/AMOUNT curr/CURRENCY`.
 
 **Q**: What does `history` show?  
 **A**: `history w/WALLET_NAME` shows the wallet's recorded outgoing send history, not every blockchain transfer involving that wallet.

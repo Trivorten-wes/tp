@@ -13,9 +13,9 @@ Crypto1010 is implemented as a modular command-line application with clear separ
 - `Crypto1010` manages the main loop, input capture, and save/load lifecycle.
 - `auth` package manages account registration, login, and password hashing.
 - `Parser` maps raw user input to concrete command objects.
-- `command` package implements user-facing functionality (`create`, `send`, `balance`, etc.).
+- `command` package implements user-facing functionality (`create`, `send`, `crossSend`, `balance`, etc.).
 - `model` package contains core blockchain and wallet logic.
-- `service` package centralizes transfer recording so blockchain writes and wallet history stay aligned.
+- `service` package centralizes transfer recording so blockchain writes and wallet history stay aligned, including cross-account transfers.
 - `storage` package persists account credentials plus account-scoped blockchain and wallet data.
 
 ### Command execution flow
@@ -175,6 +175,15 @@ Balance for a wallet is computed by scanning all transactions:
 - subtract amount when wallet is sender
 - add amount when wallet is receiver
 
+### Wallet currency tagging
+- `Wallet` now stores an optional currency code in addition to its name.
+- `create w/WALLET_NAME [curr/CURRENCY]` assigns the wallet a specific currency tag used by `crossSend`.
+- Wallets without `curr/` are stored as `generic` and behave exactly like legacy wallets.
+- `WalletStorage` remains backward-compatible:
+  - old `W|name` lines load as `generic`
+  - currency-tagged wallets persist as `W|name|currency`
+- `WalletManager` enforces at most one wallet per specific currency per account so `crossSend curr/...` can resolve a sender wallet unambiguously.
+
 ### `send` command implementation
 `SendCommand` uses prefix-based argument parsing:
 - required: `w/`, `to/`, `amt/`
@@ -206,6 +215,18 @@ Diagram source:
 - It records blockchain transactions and the sender wallet history from the same `TransferRequest`.
 - Local recipient addresses are normalized to wallet names on-chain when a matching wallet exists.
 
+### `crossSend` command implementation
+- `CrossSendCommand` accepts `acc/`, `amt/`, and `curr/`.
+- It resolves the sender from the current account's wallet tagged with the given currency.
+- It verifies:
+  - recipient account exists
+  - sender and recipient accounts are different
+  - amount is positive
+  - the sender has sufficient balance
+  - there is exactly one wallet for that currency in the current account
+- `CrossAccountTransferService` loads the recipient account's wallet and blockchain storage, creates a recipient wallet for the same currency when missing, and appends mirrored transactions to the two account chains.
+- Cross-account chain entries use an `external:` prefix, and `Blockchain.validate()` treats those synthetic accounts as exempt so recipient chains can accept inbound credit without requiring a local sender balance.
+
 ### `history` command implementation
 - `HistoryCommand` reads the persisted wallet send history from `Wallet`.
 - It validates `w/WALLET_NAME`, resolves the wallet case-insensitively through `WalletManager`, and prints numbered entries.
@@ -214,7 +235,7 @@ Diagram source:
 ### Persistence implementation
 - `AccountStorage` persists hashed credentials in `data/accounts/credentials.txt`.
 - `BlockchainStorage` serializes blockchain state to `data/accounts/USERNAME/blockchain.json`.
-- `WalletStorage` persists wallet names and transaction history in `data/accounts/USERNAME/wallets.txt`.
+- `WalletStorage` persists wallet names, wallet currencies, and transaction history in `data/accounts/USERNAME/wallets.txt`.
 - On startup, `Crypto1010` authenticates first, then loads blockchain and wallet data for the current account only.
 - If loading fails, the app falls back to a default blockchain and/or an empty wallet list.
 
@@ -243,20 +264,20 @@ Crypto1010 provides a compact, practical environment to understand wallet transf
 | v1.0 | user | list wallets | confirm available wallets in the current session |
 | v1.0 | user | check wallet balance | verify transaction effects numerically |
 | v1.0 | user | send funds with fee controls | model transfer and fee trade-offs |
+| v2.1 | user | send funds to another account with the same currency | move balances between login accounts without exchanges |
 | v1.0 | user | view my wallet send history | review past outgoing transfers |
 | v1.0 | user | validate the blockchain | confirm chain integrity after modifications |
 | v1.0 | user | inspect a specific block | view exact block-level transaction data |
 
-### Planned enhancement: cross-account transfers
-- User story: As a user, I can transfer currency to wallets owned by other account users.
-- Persist wallet addresses so recipient discovery can work across accounts.
-- Add account-aware lookup instead of limiting local resolution to the current `WalletManager`.
-- Keep account boundaries while enabling controlled inter-account transfer flows.
+### Planned enhancement: cross-account address resolution
+- User story: As a user, I can send to another account using a wallet address instead of an account name.
+- Persist generated wallet addresses across restarts.
+- Extend recipient lookup beyond the current account without requiring `acc/ACCOUNT_NAME`.
 
 ## Non-Functional Requirements
 - The application shall run on Java 17.
 - The application shall be usable entirely via CLI input/output.
-- Blockchain data shall persist locally in `data/blockchain.json`.
+- Blockchain data shall persist locally in `data/accounts/USERNAME/blockchain.json`.
 - Validation shall be deterministic for the same stored blockchain input.
 - The codebase shall remain modular enough to support adding new commands with minimal cross-component changes.
 - The project shall support automated unit testing via JUnit 5 and Gradle.
@@ -295,9 +316,11 @@ Crypto1010 provides a compact, practical environment to understand wallet transf
    - `create w/alice`
    - `create w/bob`
    - Expected: confirmation messages for each wallet.
+   - `create w/main curr/btc`
+   - Expected: wallet created message showing currency `btc`.
 1. List wallets:
    - `list`
-   - Expected: numbered wallet list including `alice` and `bob`.
+   - Expected: numbered wallet list including `alice`, `bob`, and any currency-tagged wallet with its currency shown.
 1. Check balance:
    - `balance w/bob`
    - Expected: balance displayed with 8 decimal places.
@@ -313,6 +336,16 @@ Crypto1010 provides a compact, practical environment to understand wallet transf
 1. View wallet send history:
    - `history w/bob`
    - Expected: either numbered outgoing send history entries or a no-history message.
+1. Successful cross-account transfer:
+   - Register/login as account `sender`.
+   - `create w/main curr/btc`
+   - Ensure `main` has some balance in your test data.
+   - Register a second account `receiver`.
+   - `crossSend acc/receiver amt/1 curr/btc`
+   - Expected: success output showing sender wallet, recipient account, recipient wallet, and currency.
+   - Login as `receiver`.
+   - `list`
+   - Expected: a `btc` wallet exists if one was not already present.
 1. Validate chain:
    - `validate`
    - Expected: valid-chain success message unless data is corrupted.

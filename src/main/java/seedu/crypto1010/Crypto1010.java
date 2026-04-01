@@ -38,7 +38,7 @@ public class Crypto1010 {
         WalletStorage walletStorage = new WalletStorage(Crypto1010.class, accountUsername);
         Blockchain blockchain = loadBlockchain(blockchainStorage);
         WalletManager walletManager = loadWalletManager(walletStorage);
-        Parser parser = new Parser(walletManager);
+        Parser parser = new Parser(walletManager, accountUsername, Crypto1010.class);
 
         while (true) {
             String message;

@@ -21,6 +21,7 @@ public class Blockchain {
     private static final String GENESIS_TRANSACTION = "Genesis Block";
     private static final Set<String> EXEMPT_BALANCE_ACCOUNTS =
             Set.of("network", "network-fee", "system", "coinbase", "genesis");
+    private static final String EXTERNAL_ACCOUNT_PREFIX = "external:";
     private static final Logger LOGGER = Logger.getLogger(Blockchain.class.getName());
 
     private final List<Block> blocks;
@@ -204,7 +205,8 @@ public class Blockchain {
     }
 
     private boolean isExemptAccount(String normalizedAccountName) {
-        return EXEMPT_BALANCE_ACCOUNTS.contains(normalizedAccountName);
+        return EXEMPT_BALANCE_ACCOUNTS.contains(normalizedAccountName)
+                || normalizedAccountName.startsWith(EXTERNAL_ACCOUNT_PREFIX);
     }
 
     private ValidationResult invalidWithLog(String reason) {
