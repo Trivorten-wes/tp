@@ -9,6 +9,7 @@ The application is designed for educational use and records transactions in a si
 + #### [Quick Start](#quick-start)
 + #### [Features](#features)
   + #### [Display command help: `help`](#help-display-command-help)
+  + #### [Enter tutorial mode: `tutorial`](#tutorial-enter-tutorial-mode)
   + #### [Create a wallet: `create`](#create-create-a-wallet)
   + #### [List wallets: `list`](#list-list-wallets)
   + #### [Generate keys for a wallet: `keygen`](#keygen-generate-keys-for-a-wallet)
@@ -96,7 +97,7 @@ Examples:
 - `help`
 - `help c/send`
 
-### `tutorial`: Enters tutorial mode
+### `tutorial`: Enter tutorial mode
 Format: `tutorial start`
 
 - Enters an interactive tutorial mode that guides you through the basic features of Crypto1010 step by step.
