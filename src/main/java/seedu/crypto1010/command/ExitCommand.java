@@ -10,7 +10,6 @@ public class ExitCommand extends Command {
             Format: exit
             Exits the program
             """;
-    private static final String INVALID_FORMAT_ERROR = "Error: Invalid exit format. Use: exit";
 
     public ExitCommand() {
         super(HELP_DESCRIPTION);

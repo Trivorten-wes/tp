@@ -12,7 +12,6 @@ public class ValidateCommand extends Command {
             
             Validates entire blockchain integrity
             """;
-    private static final String INVALID_FORMAT_ERROR = "Error: Invalid validate format. Use: validate";
 
     public ValidateCommand() {
         super(HELP_DESCRIPTION);

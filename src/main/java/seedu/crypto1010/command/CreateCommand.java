@@ -13,7 +13,7 @@ public class CreateCommand extends Command {
     private static final String HELP_DESCRIPTION = """
             Format: create w/WALLET_NAME [curr/CURRENCY]
             Example: create w/BobWallet curr/btc
-             
+            
             Creates a wallet with the associated NAME
             NAME must be one word without spaces
             CURRENCY is optional and is used by crossSend to identify the wallet for that currency

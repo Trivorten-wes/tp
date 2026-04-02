@@ -30,7 +30,7 @@ class ListCommandTest {
     }
 
     @Test
-    void execute_existingWallets_printsWalletNames() throws Crypto1010Exception {
+    void execute_existingWallets_printsWalletNames() {
         Blockchain blockchain = Blockchain.createDefault();
         WalletManager walletManager = new WalletManager();
         walletManager.createWallet("alice");

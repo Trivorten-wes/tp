@@ -54,9 +54,11 @@ public class TutorialCommand extends Command {
         "We do the same for bob",
         "Remember the amount of money that each wallet has before the transaction\n" +
                 "Before we send money, let's use the help command to learn how to send money",
-        "Now we are ready to send money!\n" +
-                "Let's get bob to send 3 dollars to alice\n" +
-                "For the destination, remember to use the address of alice's wallet we obtained from earlier",
+        """
+        Now we are ready to send money!
+        Let's get bob to send 3 dollars to alice
+        For the destination, remember to use the address of alice's wallet we obtained from earlier
+        """,
         "Now that the transaction is successful, let's check the balance of the wallets again starting with alice",
         "And now bob",
         "Notice how there was a fee deducted from bob's wallet in addition to the amount that he sent to alice\n" +

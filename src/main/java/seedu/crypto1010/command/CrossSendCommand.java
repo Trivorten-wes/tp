@@ -20,7 +20,7 @@ public class CrossSendCommand extends Command {
     private static final String HELP_DESCRIPTION = """
             Format: crossSend acc/ACCOUNT_NAME amt/AMOUNT curr/CURRENCY
             Example: crossSend acc/alice amt/2.5 curr/btc
-                        
+            
             Transfers AMOUNT from the current account's wallet for CURRENCY to another account
             Only same-currency transfers are allowed
             If the recipient account does not have a wallet for CURRENCY, one is created automatically

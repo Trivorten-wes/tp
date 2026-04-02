@@ -65,8 +65,6 @@ public class Crypto1010 {
                 break;
             }
             try {
-                String[] components = message.split("\\s+", 2);
-                String description = components.length > 1 ? components[1] : "";
                 Command c;
                 try {
                     c = parser.parse(message);
