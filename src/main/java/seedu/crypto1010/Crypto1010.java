@@ -36,12 +36,6 @@ public class Crypto1010 {
         printWelcome(accountUsername);
         BlockchainStorage blockchainStorage = new BlockchainStorage(Crypto1010.class, accountUsername);
         WalletStorage walletStorage = new WalletStorage(Crypto1010.class, accountUsername);
-        Blockchain blockchain = loadBlockchain(blockchainStorage);
-        WalletManager walletManager = loadWalletManager(walletStorage);
-        Parser parser = new Parser(walletManager, accountUsername, Crypto1010.class);
-        printWelcome();
-        BlockchainStorage blockchainStorage = new BlockchainStorage(Crypto1010.class);
-        WalletStorage walletStorage = new WalletStorage(Crypto1010.class);
         LoadResult<Blockchain> blockchainLoadResult = loadBlockchain(blockchainStorage);
         LoadResult<WalletManager> walletLoadResult = loadWalletManager(walletStorage);
         Blockchain blockchain = blockchainLoadResult.data();
@@ -54,7 +48,7 @@ public class Crypto1010 {
         if (!allowWalletSave) {
             System.out.println("Wallet save is disabled to avoid overwriting existing data after load failure.");
         }
-        Parser parser = new Parser(walletManager);
+        Parser parser = new Parser(walletManager, accountUsername, Crypto1010.class);
 
         while (true) {
             String message;
