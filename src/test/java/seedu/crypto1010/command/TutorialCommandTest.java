@@ -12,7 +12,7 @@ public class TutorialCommandTest {
 
     @Test
     public void execute_invalidFormat_throwsException() {
-        TutorialCommand command = new TutorialCommand();
+        TutorialCommand command = new TutorialCommand("start");
         Blockchain blockchain = Blockchain.createDefault();
 
         Crypto1010Exception thrown = assertThrows(
@@ -25,7 +25,7 @@ public class TutorialCommandTest {
 
     @Test
     public void constructor_createsInstance_success() {
-        TutorialCommand command = new TutorialCommand();
+        TutorialCommand command = new TutorialCommand("");
         assertNotNull(command);
     }
 }

@@ -8,6 +8,7 @@ import seedu.crypto1010.service.CrossAccountTransferService;
 
 import java.math.BigDecimal;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class CrossSendCommand extends Command {
@@ -45,7 +46,7 @@ public class CrossSendCommand extends Command {
     }
 
     @Override
-    public void execute(String description, Blockchain blockchain) throws Crypto1010Exception {
+    public void execute(Blockchain blockchain, Scanner in) throws Crypto1010Exception {
         ParsedArgs parsedArgs = parseArguments(arguments);
         if (parsedArgs == null) {
             throw new Crypto1010Exception(INVALID_FORMAT_ERROR);

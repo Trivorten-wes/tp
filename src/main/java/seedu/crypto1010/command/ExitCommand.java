@@ -3,6 +3,8 @@ package seedu.crypto1010.command;
 import seedu.crypto1010.exceptions.Crypto1010Exception;
 import seedu.crypto1010.model.Blockchain;
 
+import java.util.Scanner;
+
 public class ExitCommand extends Command {
     private static final String HELP_DESCRIPTION = """
             Format: exit
@@ -15,9 +17,7 @@ public class ExitCommand extends Command {
     }
 
     @Override
-    public void execute(String description, Blockchain blockchain) throws Crypto1010Exception {
-        if (description != null && !description.isBlank()) {
-            throw new Crypto1010Exception(INVALID_FORMAT_ERROR);
-        }
+    public void execute(Blockchain blockchain, Scanner in) throws Crypto1010Exception {
+        System.out.println("Exiting Crypto1010...");
     }
 }

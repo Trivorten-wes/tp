@@ -7,6 +7,7 @@ import seedu.crypto1010.model.Wallet;
 import seedu.crypto1010.model.WalletManager;
 
 import java.util.Objects;
+import java.util.Scanner;
 
 public class CreateCommand extends Command {
     private static final String HELP_DESCRIPTION = """
@@ -42,8 +43,8 @@ public class CreateCommand extends Command {
     }
 
     @Override
-    public void execute(String description, Blockchain blockchain) throws Crypto1010Exception {
-        ParsedCreateArguments parsedArguments = parseArguments(resolveArguments(description));
+    public void execute(Blockchain blockchain, Scanner in) throws Crypto1010Exception {
+        ParsedCreateArguments parsedArguments = parseArguments(resolveArguments(arguments));
         String walletName = parsedArguments.walletName();
         String currencyCode = parsedArguments.currencyCode();
 

@@ -4,6 +4,8 @@ import seedu.crypto1010.Parser;
 import seedu.crypto1010.model.Blockchain;
 import seedu.crypto1010.model.WalletManager;
 
+import java.util.Scanner;
+
 public class HelpCommand extends Command {
     private static final String COMMAND_PREFIX = "c/";
     private static final int COMMAND_LIST_COLUMN_WIDTH = 12;
@@ -27,7 +29,7 @@ public class HelpCommand extends Command {
     }
 
     @Override
-    public void execute(String description, Blockchain blockchain) {
+    public void execute(Blockchain blockchain, Scanner in) {
         WalletManager walletManager = new WalletManager();
         Parser parser = new Parser(walletManager);
 
@@ -58,7 +60,7 @@ public class HelpCommand extends Command {
                 }
 
                 Command c = parser.parse(commandName);
-                System.out.println(c.getFormatLine());
+                c.displayHelpDescription();
             }
         } catch (IllegalArgumentException e) {
             System.out.println(INVALID_FORMAT_ERROR);

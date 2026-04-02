@@ -8,6 +8,7 @@ import seedu.crypto1010.model.WalletManager;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Scanner;
 
 public class ListCommand extends Command {
     private static final String HELP_DESCRIPTION = """
@@ -28,10 +29,7 @@ public class ListCommand extends Command {
     }
 
     @Override
-    public void execute(String description, Blockchain blockchain) throws Crypto1010Exception {
-        if (description != null && !description.isBlank()) {
-            throw new Crypto1010Exception(INVALID_FORMAT_ERROR);
-        }
+    public void execute(Blockchain blockchain, Scanner in) throws Crypto1010Exception {
 
         List<Wallet> wallets = walletManager.getWallets();
         if (wallets.isEmpty()) {

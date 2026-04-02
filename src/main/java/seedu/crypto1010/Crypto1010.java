@@ -71,7 +71,7 @@ public class Crypto1010 {
                 try {
                     c = parser.parse(message);
                 } catch (IllegalArgumentException e) {
-                    System.out.println("Error: Invalid command. Use: help c/COMMAND");
+                    System.out.println("Error: Invalid command. Use: help");
                     continue;
                 }
                 if (c instanceof ExitCommand) {

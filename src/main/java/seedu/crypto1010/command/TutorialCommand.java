@@ -8,6 +8,7 @@ import seedu.crypto1010.model.WalletManager;
 import java.util.Scanner;
 
 public class TutorialCommand extends Command {
+    private final String arguments;
     private static final String HELP_DESCRIPTION = """
             Format: tutorial start
             Example: tutorial start
@@ -66,16 +67,16 @@ public class TutorialCommand extends Command {
                 "You are now ready to start your own simulated crypto blockchain!"
     };
 
-    public TutorialCommand() {
+    public TutorialCommand(String arguments) {
         super(HELP_DESCRIPTION);
+        this.arguments = arguments;
     }
 
-    public void execute (String description, Blockchain blockchain) throws Crypto1010Exception {
-        if (!description.equals("start")) {
+    public void execute (Blockchain blockchain, Scanner in) throws Crypto1010Exception {
+        if (!arguments.equals("start")) {
             throw new Crypto1010Exception(INVALID_FORMAT_ERROR);
         }
         Blockchain tutorialBlockchain = Blockchain.createDefault();
-        Scanner in = new Scanner(System.in);
         WalletManager walletManager = new WalletManager();
         Parser parser = new Parser(walletManager);
 
@@ -94,10 +95,8 @@ public class TutorialCommand extends Command {
             } else if (input.equals(instructions[index]) ||
                     (index == 9 && input.startsWith(instructions[index].substring(0,19)))) {
                 Command c = parser.parse(input);
-                String[] components = input.split("\\s+", 2);
-                String descriptions = components.length > 1 ? components[1] : "";
                 try {
-                    c.execute(descriptions, tutorialBlockchain);
+                    c.execute(tutorialBlockchain);
                     index++;
                 } catch (Crypto1010Exception e) {
                     System.out.println(ERROR_MESSAGE);
