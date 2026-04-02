@@ -80,7 +80,7 @@ public class Crypto1010 {
                 if (c instanceof ExitCommand) {
                     c.execute(blockchain, in);
                     long durationMs = (System.nanoTime() - startNs) / 1_000_000;
-                    LOGGER.info(() -> "Command executed successfully: exit (" + durationMs + " ms)");
+                    LOGGER.fine(() -> "Command executed successfully: exit (" + durationMs + " ms)");
                     saveData(
                             blockchainStorage,
                             walletStorage,
@@ -93,7 +93,7 @@ public class Crypto1010 {
                 c.execute(blockchain, in);
                 long durationMs = (System.nanoTime() - startNs) / 1_000_000;
                 String commandName = c.getClass().getSimpleName();
-                LOGGER.info(() -> "Command executed successfully: " + commandName + " (" + durationMs + " ms)");
+                LOGGER.fine(() -> "Command executed successfully: " + commandName + " (" + durationMs + " ms)");
                 saveData(
                         blockchainStorage,
                         walletStorage,
