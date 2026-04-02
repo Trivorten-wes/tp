@@ -40,6 +40,8 @@ The application is designed for educational use and records transactions in a si
    ```
 1. Enter commands in the terminal.
 1. At startup, choose `login` or `register`, then enter your username and password to access your account-specific wallets and blockchain data.
+<br>
+
 ---
 ## Startup Authentication
 - On launch, Crypto1010 requires an account before loading any wallets or blockchain data.
@@ -98,10 +100,12 @@ The application is designed for educational use and records transactions in a si
     e.g. in `validate`  
     `validate dsja 2190` will be interpreted as `validate`  
     <br/>
+<br>
+
 ### `help`: Display command help
 Format: `help [c/COMMAND]`
 
-- If no command is provided (or an invalid one is provided), all commands are listed.
+- If no command is provided, all commands are listed.
 - If a valid command is provided, detailed help for that command is shown.
 
 Examples:
@@ -249,12 +253,16 @@ This feature is not available yet in the current release.
 - `viewchain`
 - `viewblock INDEX`
 - `exit`
+<br>
+
 ---
 ## Data and Persistence
 - Account credentials are stored in `data/accounts/credentials.txt`.
 - Each account has its own blockchain data at `data/accounts/USERNAME/blockchain.json`.
 - Each account has its own wallet names, wallet currencies, and wallet send history at `data/accounts/USERNAME/wallets.txt`.
 - Generated keys and wallet addresses are not currently persisted; run `keygen` again after restarting if you need an address.
+<br>
+
 ---
 ## FAQ
 **Q**: Do different users share wallets and blockchain data?  
