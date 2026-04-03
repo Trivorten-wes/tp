@@ -11,10 +11,19 @@ My focus was improving the transfer flow (`send`), including stronger argument h
 - [Code Dashboard link: [ADD_YOUR_DASHBOARD_LINK_HERE](https://nus-cs2113-ay2526-s2.github.io/tp-dashboard/?search=jainam&sort=groupTitle&sortWithin=title&timeframe=commit&mergegroup=&groupSelect=groupByRepos&breakdown=true&checkedFileTypes=docs~functional-code~test-code~other&since=2026-02-20T00%3A00%3A00&filteredFileName=)]
 
 ### Enhancements implemented
-- Refactored `SendCommand` to improve readability and maintainability while preserving behavior.
-- Reduced parsing duplication by introducing reusable token parsing helpers and extraction methods.
-- Split long logic in `execute(...)` into focused helper methods (amount parsing, speed resolution, fee validation, summary printing).
-- Preserved and validated existing behavior through targeted tests (`SendCommandTest`).
+- Improved reliability of command handling through stronger validation and clearer parsing behavior across `send`, `balance`, `help`, and key-related flows.
+- Refactored command internals to reduce duplication and separate parsing, validation, and output responsibilities.
+- Improved wallet safety and user-facing behavior (for example, key/address handling and balance-related edge cases).
+- Enhanced transfer flow behavior, including fee-policy support (speed tiers and manual override) and clearer execution summaries.
+
+### Storage persistence contributions
+- Fixed persistence bugs where blockchain and wallet data were not reliably retained across sessions.
+- Improved save-to-disk and autosave behavior for successful transfers and wallet history updates.
+- Contributed to making storage behavior more stable and predictable during load/save cycles.
+
+### Issue contributions on GitHub (summary)
+- Resolved multiple v1.0 and v2.0 issues focused on command quality, wallet robustness, persistence reliability, and send-flow maintainability.
+- Representative completed issues: [#56](https://github.com/AY2526S2-CS2113-F14-4/tp/issues/56), [#66](https://github.com/AY2526S2-CS2113-F14-4/tp/issues/66), [#67](https://github.com/AY2526S2-CS2113-F14-4/tp/issues/67), [#68](https://github.com/AY2526S2-CS2113-F14-4/tp/issues/68).
 
 ### Contributions to the User Guide
 - Updated `send` command documentation to keep command format and behavior clear.
@@ -32,15 +41,6 @@ My focus was improving the transfer flow (`send`), including stronger argument h
 - Updated project documentation structure and cross-references between DG and diagram sources.
 - Maintained branch hygiene by creating focused branches and commits for separate concerns (code quality vs documentation).
 
-### Review/mentoring contributions
-- [ADD_LINK_TO_REVIEW_1]
-- [ADD_LINK_TO_REVIEW_2]
-- [ADD_EXAMPLE_OF_HELPING_TEAMMATE]
-
-### Contributions beyond the project team
-- [ADD_BUG_REPORT_LINK_FOR_OTHER_TEAM]
-- [ADD_FORUM_OR_TECHNICAL_SHARING_LINK]
-
 ## Optional: Developer Guide extracts
 ### SendCommand implementation and structure
 I documented the send flow and design responsibilities in the DG, emphasizing:
@@ -50,10 +50,3 @@ I documented the send flow and design responsibilities in the DG, emphasizing:
 
 ### UML diagrams contributed
 - `docs/diagrams/SendCommandClassDiagram.puml`
-
-## Optional: User Guide extracts
-### `send` command
-I contributed to user-facing documentation of the `send` command format, required and optional parameters, and fee/speed behavior.
-
-### Coming Soon
-I added a planned feature note on account switching to communicate upcoming usability and persistence improvements.
