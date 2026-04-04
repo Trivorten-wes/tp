@@ -10,6 +10,7 @@ import seedu.crypto1010.model.WalletManager;
 import seedu.crypto1010.storage.AccountStorage;
 import seedu.crypto1010.storage.BlockchainStorage;
 import seedu.crypto1010.storage.WalletStorage;
+import seedu.crypto1010.ui.InteractiveShell;
 
 import java.io.IOException;
 import java.util.NoSuchElementException;
@@ -30,8 +31,9 @@ public class Crypto1010 {
      */
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
+        InteractiveShell shell = InteractiveShell.create(in);
         AuthenticationService authenticationService = loadAuthenticationService();
-        String accountUsername = authenticateUser(in, authenticationService);
+        String accountUsername = authenticateUser(shell, authenticationService);
         if (accountUsername == null) {
             return;
         }
@@ -118,10 +120,10 @@ public class Crypto1010 {
         return authenticationService;
     }
 
-    private static String authenticateUser(Scanner in, AuthenticationService authenticationService) {
+    private static String authenticateUser(InteractiveShell shell, AuthenticationService authenticationService) {
         while (true) {
             printAuthenticationMenu(authenticationService);
-            String choice = promptForTrimmedInput(in, "Choice:");
+            String choice = shell.readPlain("Choice:");
             if (choice == null) {
                 return null;
             }
@@ -129,14 +131,14 @@ public class Crypto1010 {
             switch (choice.toLowerCase()) {
             case "1":
             case "login":
-                String loggedInUsername = handleLogin(in, authenticationService);
+                String loggedInUsername = handleLogin(shell, authenticationService);
                 if (loggedInUsername != null) {
                     return loggedInUsername;
                 }
                 break;
             case "2":
             case "register":
-                String registeredUsername = handleRegistration(in, authenticationService);
+                String registeredUsername = handleRegistration(shell, authenticationService);
                 if (registeredUsername != null) {
                     return registeredUsername;
                 }
@@ -163,14 +165,14 @@ public class Crypto1010 {
         System.out.println(DIVIDER);
     }
 
-    private static String handleLogin(Scanner in, AuthenticationService authenticationService) {
+    private static String handleLogin(InteractiveShell shell, AuthenticationService authenticationService) {
         if (!authenticationService.hasRegisteredAccounts()) {
             System.out.println("Error: No accounts registered yet. Choose register first.");
             return null;
         }
 
-        String username = promptForTrimmedInput(in, "Username:");
-        String password = promptForTrimmedInput(in, "Password:");
+        String username = shell.readPlain("Username:");
+        String password = shell.readSecret("Password:");
         if (username == null || password == null) {
             return null;
         }
@@ -185,10 +187,10 @@ public class Crypto1010 {
         }
     }
 
-    private static String handleRegistration(Scanner in, AuthenticationService authenticationService) {
-        String username = promptForTrimmedInput(in, "Choose username:");
-        String password = promptForTrimmedInput(in, "Choose password:");
-        String passwordConfirmation = promptForTrimmedInput(in, "Confirm password:");
+    private static String handleRegistration(InteractiveShell shell, AuthenticationService authenticationService) {
+        String username = shell.readPlain("Choose username:");
+        String password = shell.readSecret("Choose password:");
+        String passwordConfirmation = shell.readSecret("Confirm password:");
         if (username == null || password == null || passwordConfirmation == null) {
             return null;
         }
@@ -199,15 +201,6 @@ public class Crypto1010 {
             return registeredUsername;
         } catch (AuthenticationException | IOException e) {
             System.out.println(e.getMessage());
-            return null;
-        }
-    }
-
-    private static String promptForTrimmedInput(Scanner in, String prompt) {
-        System.out.println(prompt);
-        try {
-            return in.nextLine().strip();
-        } catch (NoSuchElementException e) {
             return null;
         }
     }
