@@ -21,6 +21,7 @@ public class TutorialCommand extends Command {
     private static final String WELCOME_MESSAGE = "Welcome to the tutorial!";
     private static final String INVALID_FORMAT_ERROR = "Error: Invalid tutorial format. Use tutorial start";
     private static final String MISSING_INPUT_ERROR = "Error: Tutorial requires interactive input.";
+    private static final String INSTRUCTION_MESSAGE = "Enter the following command:";
 
     private static final String[] instructions = {
         "create w/alice",
@@ -88,17 +89,16 @@ public class TutorialCommand extends Command {
         int index = 0;
 
         System.out.println(WELCOME_MESSAGE);
-        while (true) {
+        while (index < instructions.length) {
             System.out.println();
             System.out.println(tutorialMessages[index]);
-            System.out.println("Enter the following command:");
+            System.out.println(INSTRUCTION_MESSAGE);
             System.out.println(instructions[index]);
             String input = in.nextLine().strip();
             if (input.equals("tutorial exit") || input.equals("exit")) {
-                System.out.println(EXIT_MESSAGE);
-                return;
+                break;
             } else if (input.equals(instructions[index]) ||
-                    (index == 9 && input.startsWith(instructions[index].substring(0,19)))) {
+                    (index == 9 && input.startsWith("send w/bob amt/3 to/"))) {
                 Command c = parser.parse(input);
                 try {
                     c.execute(tutorialBlockchain);
@@ -110,5 +110,6 @@ public class TutorialCommand extends Command {
                 System.out.println(ERROR_MESSAGE);
             }
         }
+        System.out.println(EXIT_MESSAGE);
     }
 }
