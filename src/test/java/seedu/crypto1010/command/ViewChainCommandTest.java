@@ -34,12 +34,16 @@ class ViewChainCommandTest {
         assertTrue(norm.contains("================================================================================"));
         assertTrue(norm.contains(String.format("%-6s %-10s %-20s %-40s", "Index", "Tx Count", "Timestamp", "Hash Preview")));
         assertTrue(norm.contains("--------------------------------------------------------------------------------"));
-        assertTrue(norm.contains(
-            String.format("%-6d %-10d %-20s %-40s", 0, 1, "2026-02-12 14:30:21", compactHash(genesis.getCurrentHash()))
-        ));
-        assertTrue(norm.contains(
-            String.format("%-6d %-10d %-20s %-40s", 1, 3, "2026-02-12 14:35:02", compactHash(secondBlock.getCurrentHash()))
-        ));
+        assertTrue(
+            norm.contains(
+                String.format("%-6d %-10d %-20s %-40s", 0, 1, "2026-02-12 14:30:21", compactHash(genesis.getCurrentHash()))
+            )
+        );
+        assertTrue(
+            norm.contains(
+                String.format("%-6d %-10d %-20s %-40s", 1, 3, "2026-02-12 14:35:02", compactHash(secondBlock.getCurrentHash()))
+            )
+        );
     }
 
     @Test
