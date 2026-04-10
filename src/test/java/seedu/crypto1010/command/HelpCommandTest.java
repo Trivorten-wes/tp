@@ -63,7 +63,9 @@ public class HelpCommandTest {
 
         String output = outputStream.toString();
         String normOutput = output.replaceAll("\r\n", "\n").replaceAll("[ \t]+$", "");
-        assertTrue(normOutput.contains("Format: send w/WALLET_NAME to/RECIPIENT_ADDRESS amt/AMOUNT [speed/SPEED] [fee/FEE] [note/MEMO]"));
+        assertTrue(normOutput.contains(
+            "Format: send w/WALLET_NAME to/RECIPIENT_ADDRESS amt/AMOUNT [speed/SPEED] [fee/FEE] [note/MEMO]"
+        ));
     }
 
     @Test

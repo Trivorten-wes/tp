@@ -31,52 +31,52 @@ class CrossSendCommandTest {
         private String normalizeOutput(String s) {
                 return s.replaceAll("\r\n", "\n").replaceAll("[ \t]+$", "").trim();
         }
-    @TempDir
-    Path tempDir;
+        @TempDir
+        Path tempDir;
 
-    @BeforeEach
-    void setUp() throws Exception {
-        System.setProperty("crypto1010.dataDir", tempDir.toString());
-        AuthenticationService authenticationService =
-                new AuthenticationService(new AccountStorage(CrossSendCommandTest.class));
-        authenticationService.load();
-        authenticationService.register("sender", "secret1", "secret1");
-        authenticationService.register("receiver", "secret1", "secret1");
-    }
+        @BeforeEach
+        void setUp() throws Exception {
+                System.setProperty("crypto1010.dataDir", tempDir.toString());
+                AuthenticationService authenticationService =
+                        new AuthenticationService(new AccountStorage(CrossSendCommandTest.class));
+                authenticationService.load();
+                authenticationService.register("sender", "secret1", "secret1");
+                authenticationService.register("receiver", "secret1", "secret1");
+        }
 
-    @AfterEach
-    void tearDown() {
-        System.clearProperty("crypto1010.dataDir");
-    }
+        @AfterEach
+        void tearDown() {
+                System.clearProperty("crypto1010.dataDir");
+        }
 
-    @Test
-    void execute_validTransfer_createsRecipientWalletAndCreditsRecipient() throws Exception {
-        WalletManager senderWalletManager = new WalletManager();
-        Wallet senderWallet = senderWalletManager.createWallet("main", "btc");
-        Blockchain senderBlockchain = blockchainWithBalance("main", "10");
-        CrossSendCommand command =
-                new CrossSendCommand("acc/receiver amt/2 curr/btc", senderWalletManager,
-                        "sender", CrossSendCommandTest.class);
+        @Test
+        void execute_validTransfer_createsRecipientWalletAndCreditsRecipient() throws Exception {
+                WalletManager senderWalletManager = new WalletManager();
+                Wallet senderWallet = senderWalletManager.createWallet("main", "btc");
+                Blockchain senderBlockchain = blockchainWithBalance("main", "10");
+                CrossSendCommand command =
+                        new CrossSendCommand("acc/receiver amt/2 curr/btc", senderWalletManager,
+                                "sender", CrossSendCommandTest.class);
 
-        String output = runCommand(command, senderBlockchain);
+                String output = runCommand(command, senderBlockchain);
 
-        String norm = normalizeOutput(output);
-        assertTrue(norm.contains("Cross-account transfer completed successfully."));
-        assertTrue(norm.contains("Recipient wallet was created automatically."));
-        assertTrue(norm.contains("============================================================"));
-        assertEquals(new BigDecimal("8"), senderBlockchain.getPreciseBalance("main"));
-        assertEquals(1, senderWallet.getTransactionHistory().size());
-        assertEquals("crossSend acc/receiver amt/2 curr/btc", senderWallet.getTransactionHistory().get(0));
+                String norm = normalizeOutput(output);
+                assertTrue(norm.contains("Cross-account transfer completed successfully."));
+                assertTrue(norm.contains("Recipient wallet was created automatically."));
+                assertTrue(norm.contains("============================================================"));
+                assertEquals(new BigDecimal("8"), senderBlockchain.getPreciseBalance("main"));
+                assertEquals(1, senderWallet.getTransactionHistory().size());
+                assertEquals("crossSend acc/receiver amt/2 curr/btc", senderWallet.getTransactionHistory().get(0));
 
-        WalletManager recipientWalletManager = new WalletStorage(CrossSendCommandTest.class, "receiver").load();
-        assertEquals(1, recipientWalletManager.getWallets().size());
-        Wallet recipientWallet = recipientWalletManager.getWallets().get(0);
-        assertEquals("btc", recipientWallet.getName());
-        assertEquals("btc", recipientWallet.getCurrencyCode());
+                WalletManager recipientWalletManager = new WalletStorage(CrossSendCommandTest.class, "receiver").load();
+                assertEquals(1, recipientWalletManager.getWallets().size());
+                Wallet recipientWallet = recipientWalletManager.getWallets().get(0);
+                assertEquals("btc", recipientWallet.getName());
+                assertEquals("btc", recipientWallet.getCurrencyCode());
 
-        Blockchain recipientBlockchain = new BlockchainStorage(CrossSendCommandTest.class, "receiver").load();
-        assertEquals(new BigDecimal("2"), recipientBlockchain.getPreciseBalance("btc"));
-    }
+                Blockchain recipientBlockchain = new BlockchainStorage(CrossSendCommandTest.class, "receiver").load();
+                assertEquals(new BigDecimal("2"), recipientBlockchain.getPreciseBalance("btc"));
+        }
 
     @Test
     void execute_existingRecipientCurrencyWallet_creditsExistingWallet() throws Exception {

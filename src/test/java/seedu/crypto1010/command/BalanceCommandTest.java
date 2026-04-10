@@ -62,7 +62,7 @@ class BalanceCommandTest {
         String normExpected = expected.replaceAll("\\r\\n", "\n").replaceAll("[ \t]+$", "");
         String normOutput = output.replaceAll("\\r\\n", "\n").replaceAll("[ \t]+$", "");
         assertEquals(normExpected, normOutput);
-        }
+    }
 
     @Test
         void execute_selfTransfer_keepsNetZeroBalance() {
@@ -91,7 +91,7 @@ class BalanceCommandTest {
         String normExpected = expected.replaceAll("\\r\\n", "\n").replaceAll("[ \t]+$", "");
         String normOutput = output.replaceAll("\\r\\n", "\n").replaceAll("[ \t]+$", "");
         assertEquals(normExpected, normOutput);
-        }
+    }
 
     @Test
     void execute_blankWalletNameAfterPrefix_throwsException() {
