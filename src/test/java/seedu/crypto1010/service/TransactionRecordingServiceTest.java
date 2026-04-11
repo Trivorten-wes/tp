@@ -107,7 +107,7 @@ class TransactionRecordingServiceTest {
                 Crypto1010Exception.class,
                 () -> service.recordTransfer(request, blockchain));
 
-        assertEquals("invalid, sent amount is more than balance, nothing was sent", exception.getMessage());
+        assertEquals("Error: Insufficient balance.", exception.getMessage());
         assertEquals(2, blockchain.size());
         assertTrue(alice.getTransactionHistory().isEmpty());
     }

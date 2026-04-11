@@ -152,7 +152,7 @@ class CrossSendCommandTest {
                 Crypto1010Exception.class,
                 () -> command.execute(senderBlockchain));
 
-        assertEquals("invalid, sent amount is more than balance, nothing was sent", exception.getMessage());
+        assertEquals("Error: Insufficient balance.", exception.getMessage());
     }
 
     @Test
