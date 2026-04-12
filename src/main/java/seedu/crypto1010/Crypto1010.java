@@ -215,10 +215,23 @@ public class Crypto1010 {
     }
 
     private static String handleRegistration(InteractiveShell shell, AuthenticationService authenticationService) {
-        String username = shell.readPlain("Choose username:");
+        String username;
+        while (true) {
+            username = shell.readPlain("Choose username:");
+            if (username == null) {
+                return null;
+            }
+            try {
+                username = authenticationService.validateNewUsername(username);
+                break;
+            } catch (AuthenticationException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
         String password = shell.readSecret("Choose password:");
         String passwordConfirmation = shell.readSecret("Confirm password:");
-        if (username == null || password == null || passwordConfirmation == null) {
+        if (password == null || passwordConfirmation == null) {
             return null;
         }
 
