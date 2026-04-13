@@ -3,6 +3,9 @@ package seedu.crypto1010.model;
 import java.util.Locale;
 import java.util.Set;
 
+/**
+ * Normalizes and validates wallet currency codes.
+ */
 public final class CurrencyCode {
     public static final String GENERIC = "generic";
     private static final Set<String> SUPPORTED_CURRENCIES = Set.of("eth", "btc");
