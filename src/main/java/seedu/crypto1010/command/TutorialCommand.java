@@ -130,6 +130,7 @@ public class TutorialCommand extends Command {
 
         """
             Now let's send some funds from Bob to Alice.
+            Remember to use Alice's wallet address that we found earlier as the destination.
             When Bob sends money, his wallet uses his private key to cryptographically sign the transaction,
             proving he authorised it without ever revealing the key.
             Anyone on the network can verify this using his public key, but only Bob could have created that signature.

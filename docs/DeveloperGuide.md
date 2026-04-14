@@ -333,7 +333,7 @@ Two layers of error handling are used:
 - Separate `tutorialBlockchain` prevents contamination of user data.
 
 **Strict step control**
-- User input must match given String exactly to continue (except for address which is non-deterministic).
+- User input must match given String exactly to continue (excluding trailing whitespaces).
 - Index-based progression ensures linear, deterministic tutorial flow.
 
 **Reuse of command system**

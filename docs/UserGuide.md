@@ -124,6 +124,7 @@ Format: `tutorial start`
 
 - Enters an interactive tutorial mode that guides you through the basic features of Crypto1010 step by step.
 - Uses isolated temporary tutorial data and does not affect your account data.
+- User must type the exact given command to continue
 - Type `tutorial exit` to leave tutorial mode.
 - Type `exit` during tutorial to exit the app globally.
 
