@@ -62,7 +62,7 @@ public class HelpCommand extends Command {
                 Command c = parser.parse(commandName);
                 c.displayHelpDescription();
             }
-        } catch (IllegalArgumentException e) {
+        } catch (Exception e) {
             throw new Crypto1010Exception(INVALID_FORMAT_ERROR);
         }
     }
