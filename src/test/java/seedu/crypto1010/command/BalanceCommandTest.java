@@ -49,7 +49,17 @@ class BalanceCommandTest {
 
     @Test
     void execute_existingWallet_printsBalanceToEightDecimalPlaces() throws Crypto1010Exception {
-        Blockchain blockchain = Blockchain.createDefault();
+        Blockchain blockchain = new Blockchain(List.of(
+            new Block(
+                0,
+                LocalDateTime.of(2026, 2, 12, 14, 30, 21),
+                "0000000000000000",
+                List.of("Genesis Block")),
+            new Block(
+                1,
+                LocalDateTime.of(2026, 2, 12, 14, 35, 2),
+                "prev-hash",
+                List.of("network -> bob : 5"))));
         WalletManager walletManager = new WalletManager();
         walletManager.createWallet("bob");
         BalanceCommand command = new BalanceCommand("w/bob", walletManager);

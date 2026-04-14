@@ -3,7 +3,7 @@ package seedu.crypto1010.command;
 
 import org.junit.jupiter.api.Test;
 import seedu.crypto1010.model.Blockchain;
-import seedu.crypto1010.exceptions.Crypto1010Exception;
+// ...existing code...
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -39,14 +39,14 @@ public class HelpCommandTest {
         HelpCommand helpCommand = new HelpCommand("c/invalidCommand");
         Blockchain blockchain = Blockchain.createDefault();
 
-    Crypto1010Exception exception = org.junit.jupiter.api.Assertions.assertThrows(
-        Crypto1010Exception.class,
-        () -> helpCommand.execute(blockchain)
-    );
-    org.junit.jupiter.api.Assertions.assertEquals(
-        "Error: Invalid help format. Use: help [c/COMMAND]",
-        exception.getMessage()
-    );
+        Crypto1010Exception exception = org.junit.jupiter.api.Assertions.assertThrows(
+                Crypto1010Exception.class,
+                () -> helpCommand.execute(blockchain)
+        );
+        org.junit.jupiter.api.Assertions.assertEquals(
+                "Error: Invalid help format. Use: help [c/COMMAND]",
+                exception.getMessage()
+        );
     }
 
     @Test
