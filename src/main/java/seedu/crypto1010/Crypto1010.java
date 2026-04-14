@@ -29,6 +29,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
+/**
+ * Coordinates authentication, command execution, and persistence for the CLI application.
+ */
 public class Crypto1010 {
     private static final Logger LOGGER = Logger.getLogger(Crypto1010.class.getName());
     private static final String ACCOUNT_ACCESS_HEADER = "Crypto1010 Account Access";
@@ -69,6 +72,9 @@ public class Crypto1010 {
         CliVisuals.printLogo(loadLogoLines(), STARTUP_SLOGAN);
     }
 
+    /**
+     * Loads the optional ASCII logo bundled with the application.
+     */
     private static List<String> loadLogoLines() {
         InputStream logoStream = Crypto1010.class.getClassLoader().getResourceAsStream(LOGO_RESOURCE_PATH);
         if (logoStream == null) {
@@ -86,6 +92,7 @@ public class Crypto1010 {
             InteractiveShell shell,
             CommandAutoCompleter completer,
             String accountUsername) {
+        // Each authenticated session reads and writes storage files scoped to that account.
         printWelcome(accountUsername);
         BlockchainStorage blockchainStorage = new BlockchainStorage(Crypto1010.class, accountUsername);
         WalletStorage walletStorage = new WalletStorage(Crypto1010.class, accountUsername);
@@ -110,8 +117,9 @@ public class Crypto1010 {
             try {
                 message = shell.readCommand(buildCommandPrompt(accountUsername));
             } catch (RuntimeException e) {
+                // Terminal failures are treated like an exit so the current session can still be saved.
                 completer.setAuthMode(true);
-                saveData(
+                saveDataOrExit(
                         blockchainStorage,
                         walletStorage,
                         blockchain,
@@ -121,8 +129,9 @@ public class Crypto1010 {
                 return SessionOutcome.EXIT;
             }
             if (message == null) {
+                // End-of-input should shut down cleanly after persisting the latest in-memory state.
                 completer.setAuthMode(true);
-                saveData(
+                saveDataOrExit(
                         blockchainStorage,
                         walletStorage,
                         blockchain,
@@ -142,10 +151,11 @@ public class Crypto1010 {
                 }
                 long startNs = System.nanoTime();
                 if (c instanceof ExitCommand) {
+                    // Exit ends the whole application instead of returning to account selection.
                     c.execute(blockchain, in);
                     long durationMs = (System.nanoTime() - startNs) / 1_000_000;
                     LOGGER.fine(() -> "Command executed successfully: exit (" + durationMs + " ms)");
-                    saveData(
+                    saveDataOrExit(
                             blockchainStorage,
                             walletStorage,
                             blockchain,
@@ -157,7 +167,8 @@ public class Crypto1010 {
 
                 c.execute(blockchain, in);
                 if (c instanceof TutorialCommand tutorialCommand && tutorialCommand.isExitRequested()) {
-                    saveData(
+                    // The tutorial can trigger a full application exit via the `exit` command.
+                    saveDataOrExit(
                             blockchainStorage,
                             walletStorage,
                             blockchain,
@@ -169,15 +180,20 @@ public class Crypto1010 {
                 long durationMs = (System.nanoTime() - startNs) / 1_000_000;
                 String commandName = c.getClass().getSimpleName();
                 LOGGER.fine(() -> "Command executed successfully: " + commandName + " (" + durationMs + " ms)");
-                saveData(
+                if (!saveData(
                         blockchainStorage,
                         walletStorage,
                         blockchain,
                         walletManager,
                         allowBlockchainSave,
-                        allowWalletSave);
+                        allowWalletSave)) {
+                    completer.setWalletManager(null);
+                    completer.setAuthMode(true);
+                    return SessionOutcome.EXIT;
+                }
 
                 if (c instanceof LogoutCommand logoutCommand && logoutCommand.isLogoutConfirmed()) {
+                    // Logout returns to account access without terminating the process.
                     System.out.println("Logged out from " + accountUsername + ".");
                     completer.setWalletManager(null);
                     completer.setAuthMode(true);
@@ -190,6 +206,9 @@ public class Crypto1010 {
         }
     }
 
+    /**
+     * Loads registered accounts, defaulting to an empty account list when storage is unavailable.
+     */
     private static AuthenticationService loadAuthenticationService() {
         AuthenticationService authenticationService = new AuthenticationService(new AccountStorage(Crypto1010.class));
         try {
@@ -200,6 +219,9 @@ public class Crypto1010 {
         return authenticationService;
     }
 
+    /**
+     * Handles the login/register/exit loop before entering an authenticated session.
+     */
     private static String authenticateUser(InteractiveShell shell, AuthenticationService authenticationService) {
         while (true) {
             printAuthenticationMenu(authenticationService);
@@ -308,6 +330,9 @@ public class Crypto1010 {
         return COMMAND_PROMPT_FORMAT.formatted(accountUsername);
     }
 
+    /**
+     * Loads the current account's blockchain and tracks whether saving back is safe.
+     */
     private static LoadResult<Blockchain> loadBlockchain(BlockchainStorage storage) {
         try {
             return new LoadResult<>(storage.load(), true);
@@ -317,6 +342,9 @@ public class Crypto1010 {
         }
     }
 
+    /**
+     * Loads the current account's wallets and tracks whether saving back is safe.
+     */
     private static LoadResult<WalletManager> loadWalletManager(WalletStorage storage) {
         try {
             return new LoadResult<>(storage.load(), true);
@@ -326,18 +354,30 @@ public class Crypto1010 {
         }
     }
 
-    private static void saveData(
+    private static void saveDataOrExit(
             BlockchainStorage blockchainStorage,
             WalletStorage walletStorage,
             Blockchain blockchain,
             WalletManager walletManager,
             boolean allowBlockchainSave,
             boolean allowWalletSave) {
+        saveData(blockchainStorage, walletStorage, blockchain, walletManager, allowBlockchainSave, allowWalletSave);
+    }
+
+    private static boolean saveData(
+            BlockchainStorage blockchainStorage,
+            WalletStorage walletStorage,
+            Blockchain blockchain,
+            WalletManager walletManager,
+            boolean allowBlockchainSave,
+            boolean allowWalletSave) {
+        boolean allSaved = true;
         if (allowBlockchainSave) {
             try {
                 blockchainStorage.save(blockchain);
             } catch (IOException e) {
                 System.out.println("Failed to save blockchain data.");
+                allSaved = false;
             }
         }
         if (allowWalletSave) {
@@ -345,8 +385,13 @@ public class Crypto1010 {
                 walletStorage.save(walletManager);
             } catch (IOException e) {
                 System.out.println("Failed to save wallet data.");
+                allSaved = false;
             }
         }
+        if (!allSaved) {
+            System.out.println("Persistence error encountered. Exiting to prevent further inconsistency.");
+        }
+        return allSaved;
     }
 
     private enum SessionOutcome {

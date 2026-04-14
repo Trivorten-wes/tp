@@ -10,6 +10,9 @@ import org.bouncycastle.crypto.digests.RIPEMD160Digest;
 
 import seedu.crypto1010.exceptions.Crypto1010Exception;
 
+/**
+ * Generates secp256k1 key pairs and derives wallet addresses for supported currencies.
+ */
 public class KeyPair {
     private static final String GENERATE_START = "Generating secp256k1 keypair...";
     private static final String PRIVATE_KEY_DISPLAY = "Private key: ";
@@ -37,7 +40,7 @@ public class KeyPair {
             "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8", 16);
     private static final BigInteger coefficient = BigInteger.valueOf(7);
 
-    static final ECPoint generatorPoint = new ECPoint(generatorX, generatorY);
+    private static final ECPoint GENERATOR_POINT = new ECPoint(generatorX, generatorY);
     private static final SecureRandom RANDOM = new SecureRandom();
     private static final byte BTC_VERSION_BYTE = 0x00;
 
@@ -76,6 +79,17 @@ public class KeyPair {
         return currencyCode;
     }
 
+    /**
+     * Restores keypair data from previous sessions to insert into this session.
+     */
+    public static KeyPair restore(BigInteger privateKey, BigInteger publicKeyX,
+                                  BigInteger publicKeyY, String address, String currencyCode) {
+        return new KeyPair(privateKey, publicKeyX, publicKeyY, address, currencyCode);
+    }
+
+    /**
+     * Picks the address derivation strategy that matches the wallet currency.
+     */
     public static KeyPair generate(String currencyCode) throws Crypto1010Exception {
         String normalized = CurrencyCode.normalizeOrDefault(currencyCode);
         if (normalized.equals("btc")) {
@@ -93,7 +107,7 @@ public class KeyPair {
         BigInteger privateKey = generatePrivateKey();
         System.out.println(PRIVATE_KEY_DISPLAY + truncate(privateKey.toString(16)));
 
-        ECPoint publicKeyPoint = ECCurve.scalarMultiply(privateKey, generatorPoint);
+        ECPoint publicKeyPoint = ECCurve.scalarMultiply(privateKey, GENERATOR_POINT);
 
         System.out.println(ON_CURVE_DISPLAY);
         if (!ECCurve.isOnCurve(publicKeyPoint)) {
@@ -119,7 +133,7 @@ public class KeyPair {
         BigInteger privateKey = generatePrivateKey();
         System.out.println(PRIVATE_KEY_DISPLAY + truncate(privateKey.toString(16)));
 
-        ECPoint publicKeyPoint = ECCurve.scalarMultiply(privateKey, generatorPoint);
+        ECPoint publicKeyPoint = ECCurve.scalarMultiply(privateKey, GENERATOR_POINT);
 
         System.out.println(ON_CURVE_DISPLAY);
         if (!ECCurve.isOnCurve(publicKeyPoint)) {
@@ -145,7 +159,7 @@ public class KeyPair {
         BigInteger privateKey = generatePrivateKey();
         System.out.println(PRIVATE_KEY_DISPLAY + truncate(privateKey.toString(16)));
 
-        ECPoint publicKeyPoint = ECCurve.scalarMultiply(privateKey, generatorPoint);
+        ECPoint publicKeyPoint = ECCurve.scalarMultiply(privateKey, GENERATOR_POINT);
 
         System.out.println(ON_CURVE_DISPLAY);
         if (!ECCurve.isOnCurve(publicKeyPoint)) {
@@ -165,6 +179,9 @@ public class KeyPair {
                            address, CurrencyCode.GENERIC);
     }
 
+    /**
+     * Ethereum addresses use the last 20 bytes of the Keccak-256 hash of the uncompressed public key.
+     */
     private static String deriveEthAddress(ECPoint publicKeyPoint) {
         byte[] publicKeyBytes = new byte[64];
         byte[] xBytes = toBytes32(publicKeyPoint.xCoord);
@@ -184,6 +201,9 @@ public class KeyPair {
         return address.toString();
     }
 
+    /**
+     * Builds a legacy Base58Check Bitcoin address from the compressed public key.
+     */
     private static String deriveBtcAddress(ECPoint publicKeyPoint) throws Crypto1010Exception {
         byte[] compressedPublicKey = new byte[33];
         compressedPublicKey[0] = publicKeyPoint.yCoord.testBit(0) ? (byte) 0x03 : (byte) 0x02;
@@ -210,7 +230,7 @@ public class KeyPair {
         versioned[0] = BTC_VERSION_BYTE;
         System.arraycopy(ripemd160Hash, 0, versioned, 1, 20);
 
-        // 4-byte checksum — double SHA-256
+        // 4-byte checksum - double SHA-256
         byte[] checksum = computeChecksum(versioned);
 
         // append checksum
@@ -234,6 +254,9 @@ public class KeyPair {
         }
     }
 
+    /**
+     * Normalizes an unsigned big integer into the fixed 32-byte width expected by secp256k1 operations.
+     */
     private static byte[] toBytes32(BigInteger value) {
         byte[] bytes = value.toByteArray();
         byte[] result = new byte[32];
@@ -245,6 +268,9 @@ public class KeyPair {
         return result;
     }
 
+    /**
+     * Generates a private key in the valid secp256k1 range [1, curveOrder).
+     */
     private static BigInteger generatePrivateKey() {
         BigInteger privateKey;
         do {
@@ -262,6 +288,9 @@ public class KeyPair {
                 + hex.substring(hex.length() - TRUNCATED_PART_LENGTH);
     }
 
+    /**
+     * Point at infinity acts as the additive identity during elliptic-curve arithmetic.
+     */
     private static class ECPoint {
         final BigInteger xCoord;
         final BigInteger yCoord;
@@ -280,6 +309,9 @@ public class KeyPair {
         }
     }
 
+    /**
+     * Minimal secp256k1 arithmetic used to derive public keys from private keys.
+     */
     private static class ECCurve {
         private static BigInteger floorMod(BigInteger a) {
             return a.mod(fieldPrime).add(fieldPrime).mod(fieldPrime);
@@ -290,16 +322,16 @@ public class KeyPair {
                 return point;
             }
 
-            // λ = 3x² × (2y)⁻¹ mod p
+            // lambda = 3x^2 * (2y)^-1 mod p
             BigInteger lambda = BigInteger.valueOf(3)
                     .multiply(point.xCoord.pow(2))
                     .mod(fieldPrime)
                     .multiply(floorMod(BigInteger.TWO.multiply(point.yCoord)).modInverse(fieldPrime))
                     .mod(fieldPrime);
 
-            // x' = λ² - 2x mod p
+            // x' = lambda^2 - 2x mod p
             BigInteger resultX = floorMod(lambda.pow(2).subtract(BigInteger.TWO.multiply(point.xCoord)));
-            // y' = λ(x - x') - y mod p
+            // y' = lambda(x - x') - y mod p
             BigInteger resultY = floorMod(lambda.multiply(point.xCoord.subtract(resultX)).subtract(point.yCoord));
 
             return new ECPoint(resultX, resultY);
@@ -319,14 +351,14 @@ public class KeyPair {
                 return pointDouble(pointOne);
             }
 
-            // λ = (y2 - y1) / (x2 - x1) mod p
+            // lambda = (y2 - y1) / (x2 - x1) mod p
             BigInteger lambda = floorMod(pointTwo.yCoord.subtract(pointOne.yCoord))
                     .multiply(floorMod(pointTwo.xCoord.subtract(pointOne.xCoord)).modInverse(fieldPrime))
                     .mod(fieldPrime);
 
-            // x' = λ² - x1 - x2 mod p
+            // x' = lambda^2 - x1 - x2 mod p
             BigInteger resultX = floorMod(lambda.pow(2).subtract(pointOne.xCoord).subtract(pointTwo.xCoord));
-            // y' = λ(x1 - x') - y1 mod p
+            // y' = lambda(x1 - x') - y1 mod p
             BigInteger resultY = floorMod(lambda.multiply(pointOne.xCoord.subtract(resultX)).subtract(pointOne.yCoord));
 
             return new ECPoint(resultX, resultY);
@@ -357,6 +389,9 @@ public class KeyPair {
         }
     }
 
+    /**
+     * Encodes the final Bitcoin payload using the Base58 alphabet that avoids ambiguous characters.
+     */
     private static class Base58 {
         private static final String ALPHABET =
                 "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";

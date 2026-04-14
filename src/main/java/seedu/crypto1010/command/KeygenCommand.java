@@ -10,12 +10,15 @@ import seedu.crypto1010.ui.CliVisuals;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Generates a key pair and address for a wallet that does not have one yet.
+ */
 public class KeygenCommand extends Command {
     private static final String HELP_DESCRIPTION = """
             Format: keygen w/WALLET_NAME
             Example: keygen w/mainwallet
             
-            Generates and displays key pair for new wallet, or regenerates for existing wallet
+            Generates and displays key pair for a wallet that does not already have keys
             Displays the process of creating a key pair
             """;
 

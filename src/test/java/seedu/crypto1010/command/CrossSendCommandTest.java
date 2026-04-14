@@ -127,7 +127,7 @@ class CrossSendCommandTest {
     }
 
     @Test
-    void execute_senderCurrencyWalletMissing_throwsException() {
+    void execute_senderCurrencyWalletMissing_throwsException() throws Crypto1010Exception {
         WalletManager senderWalletManager = new WalletManager();
         senderWalletManager.createWallet("main");
         Blockchain senderBlockchain = blockchainWithBalance("main", "10");
@@ -144,7 +144,7 @@ class CrossSendCommandTest {
     }
 
     @Test
-    void execute_recipientMissing_throwsException() {
+    void execute_recipientMissing_throwsException() throws Crypto1010Exception {
         WalletManager senderWalletManager = new WalletManager();
         senderWalletManager.createWallet("main", "btc");
         Blockchain senderBlockchain = blockchainWithBalance("main", "10");
@@ -160,7 +160,7 @@ class CrossSendCommandTest {
     }
 
     @Test
-    void execute_insufficientBalance_throwsException() {
+    void execute_insufficientBalance_throwsException() throws Crypto1010Exception {
         WalletManager senderWalletManager = new WalletManager();
         senderWalletManager.createWallet("main", "btc");
         Blockchain senderBlockchain = blockchainWithBalance("main", "1");
@@ -176,7 +176,7 @@ class CrossSendCommandTest {
     }
 
     @Test
-    void execute_sameAccount_throwsException() {
+    void execute_sameAccount_throwsException() throws Crypto1010Exception {
         WalletManager senderWalletManager = new WalletManager();
         senderWalletManager.createWallet("main", "btc");
         Blockchain senderBlockchain = blockchainWithBalance("main", "10");
@@ -244,7 +244,7 @@ class CrossSendCommandTest {
     }
 
     @Test
-    void execute_invalidCurrency_throwsException() {
+    void execute_invalidCurrency_throwsException() throws Crypto1010Exception {
         WalletManager senderWalletManager = new WalletManager();
         senderWalletManager.createWallet("main", "btc");
         Blockchain senderBlockchain = blockchainWithBalance("main", "10");
@@ -262,7 +262,7 @@ class CrossSendCommandTest {
     }
 
     @Test
-    void execute_extremeScientificAmount_throwsException() {
+    void execute_extremeScientificAmount_throwsException() throws Crypto1010Exception {
         WalletManager senderWalletManager = new WalletManager();
         senderWalletManager.createWallet("main", "btc");
         Blockchain senderBlockchain = blockchainWithBalance("main", "10");
